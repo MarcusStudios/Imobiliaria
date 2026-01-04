@@ -1,52 +1,47 @@
-// src/pages/Favoritos.tsx
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, where, documentId } from 'firebase/firestore';
-import { db } from '../../services/firebaseConfig';
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../services/firebaseConfig'; // Ajuste se necessário
 import type { Imovel } from '../types';
+import { ImovelCard } from '../components/ImovelCard'; // <--- Reutilize o Card!
+import { useFavoritos } from '../contexts/FavoritosContext'; // <--- Contexto
 
-// Vamos precisar reutilizar o ImovelCard (poderíamos extrair ele para um componente separado também, mas vamos simplificar aqui)
-// IMPORTANTE: Para isso funcionar 100% limpo, você deve mover o componente ImovelCard do App.tsx para src/components/ImovelCard.tsx
-// Vou assumir que você fará isso ou copiará o card aqui. Para facilitar, vou fazer uma versão simples do card aqui.
-
-export const Favoritos = ({ favoritosIds }: { favoritosIds: string[] }) => {
+export const Favoritos = () => {
+  const { favoritos } = useFavoritos(); // <--- Pega IDs do contexto
   const [listaFavoritos, setListaFavoritos] = useState<Imovel[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFavoritos = async () => {
-      if (favoritosIds.length === 0) {
+      if (favoritos.length === 0) {
         setListaFavoritos([]);
         setLoading(false);
         return;
       }
 
       try {
-        // O Firestore tem um limite para 'in', então se tiver muitos favoritos, o ideal é buscar tudo e filtrar no front
-        // ou fazer em lotes. Vamos buscar tudo e filtrar no front pela simplicidade do tutorial.
+        // Busca simples (Melhoria futura: usar query 'in' do firebase para trazer só os necessários)
         const querySnapshot = await getDocs(collection(db, "imoveis"));
-        const data = querySnapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() } as Imovel))
-          .filter(imovel => favoritosIds.includes(imovel.id));
+        const todos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Imovel));
         
-        setListaFavoritos(data);
+        // Filtra
+        const apenasFavs = todos.filter(imovel => favoritos.includes(imovel.id));
+        setListaFavoritos(apenasFavs);
       } catch (error) {
-        console.error("Erro ao buscar favoritos:", error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchFavoritos();
-  }, [favoritosIds]);
+  }, [favoritos]); // Recarrega se a lista de favoritos mudar
 
-  if (loading) return <div className="container" style={{padding:'2rem'}}>Carregando seus favoritos...</div>;
+  if (loading) return <div className="container" style={{padding:'2rem'}}>Carregando...</div>;
 
   return (
     <div className="container" style={{ padding: '2rem 0' }}>
       <h1>Meus Favoritos ❤️</h1>
-      
       {listaFavoritos.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
           <h3>Você ainda não tem favoritos.</h3>
@@ -57,17 +52,8 @@ export const Favoritos = ({ favoritosIds }: { favoritosIds: string[] }) => {
       ) : (
         <div className="grid">
           {listaFavoritos.map(imovel => (
-            <div key={imovel.id} className="card">
-               <div className="card-img-wrapper">
-                 <img src={imovel.imagens[0]} alt={imovel.titulo} className="card-img" />
-                 <span className="badge-type">{imovel.tipo}</span>
-               </div>
-               <div className="card-body">
-                 <h3>{imovel.titulo}</h3>
-                 <p className="price">R$ {imovel.preco.toLocaleString('pt-BR')}</p>
-                 <Link to={`/imovel/${imovel.id}`} className="btn-details">Ver Detalhes</Link>
-               </div>
-            </div>
+             // Reutilizando o componente Card, ele já vem com o botão de coração funcionando
+             <ImovelCard key={imovel.id} imovel={imovel} />
           ))}
         </div>
       )}

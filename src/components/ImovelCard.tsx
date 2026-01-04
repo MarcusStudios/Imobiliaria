@@ -2,14 +2,18 @@
 import { Link } from 'react-router-dom';
 import { Bed, Bath, Maximize, MapPin, Heart } from 'lucide-react';
 import type { Imovel } from '../types';
+import { useFavoritos } from '../contexts/FavoritosContext'; // <--- Importe o Hook
 
 interface ImovelCardProps {
   imovel: Imovel;
-  isFav: boolean;
-  onToggleFav: (id: string) => void;
+  // Removemos as props isFav e onToggleFav, pois o card se vira sozinho agora
 }
 
-export const ImovelCard = ({ imovel, isFav, onToggleFav }: ImovelCardProps) => {
+export const ImovelCard = ({ imovel }: ImovelCardProps) => {
+  const { favoritos, toggleFavorito } = useFavoritos(); // <--- Usa o contexto
+  const isFav = favoritos.includes(imovel.id);
+
+  // Proteção de imagem
   const capa = imovel.imagens && imovel.imagens.length > 0 
     ? imovel.imagens[0] 
     : "https://via.placeholder.com/400x300?text=Sem+Foto";
@@ -19,13 +23,16 @@ export const ImovelCard = ({ imovel, isFav, onToggleFav }: ImovelCardProps) => {
       <div className="card-img-wrapper">
         <img src={capa} alt={imovel.titulo} className="card-img" />
         <span className="badge-type">{imovel.tipo}</span>
+        
         <button 
           className={`btn-fav ${isFav ? "active" : ""}`}
           onClick={(e) => {
             e.preventDefault();
-            onToggleFav(imovel.id);
+            toggleFavorito(imovel.id);
           }}
+          title={isFav ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
+          {/* O fill preenche o coração se for favorito */}
           <Heart size={18} fill={isFav ? "currentColor" : "none"} />
         </button>
       </div>
