@@ -1,15 +1,33 @@
-// src/types/index.ts
 export interface Imovel {
   id: string;
   titulo: string;
-  tipo: string;
-  preco: number;
-  imagens: string[];
+  tipo: 'Venda' | 'Aluguel' | 'Ambos';
+  
+  preco: number;          // Preço principal (Venda OU Aluguel se for único)
+  precoAluguel?: number;  // NOVO: Preço específico de aluguel para caso "Ambos"
+  
+  endereco: string;
+  bairro: string;
+  cidade: string;
+  lat?: number;
+  lng?: number;
+
   quartos: number;
   banheiros: number;
+  suites?: number;
+  vagas?: number;
   area: number;
-  endereco: string;
   descricao: string;
-  lat: number;
-  lng: number;
+
+  condominio?: number;
+  iptu?: number;
+
+  piscina?: boolean;
+  churrasqueira?: boolean;
+  elevador?: boolean;
+  mobiliado?: boolean;
+  portaria?: boolean;
+  aceitaPet?: boolean;
+
+  imagens: string[];
 }

@@ -10,16 +10,35 @@ export const RecuperarSenha = () => {
   
   const { resetPassword } = useAuth();
 
-  const handleSubmit = async (e: FormEvent) => {
+ const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
       setMessage('');
       setError('');
       setLoading(true);
+      
+      console.log("Tentando enviar email para:", email);
+      
       await resetPassword(email);
-      setMessage('Verifique sua caixa de entrada para redefinir a senha.');
+      
+      console.log("Firebase diz que enviou!");
+      setMessage('Se o e-mail estiver cadastrado, você receberá um link em instantes.');
+      setMessage(prev => prev + ' Verifique sua caixa de spam também.');
+      
     } catch (err) {
-      setError('Falha ao enviar email. Verifique se o endereço está correto.');
+      // 1. Removemos o ': any' lá de cima e tratamos aqui dentro
+      console.error("ERRO FIREBASE:", err);
+      
+      // 2. Avisamos ao TypeScript que 'err' é um objeto que pode ter 'code' e 'message'
+      const error = err as { code?: string; message?: string };
+
+      if (error.code === 'auth/user-not-found') {
+        setError('Este e-mail não está cadastrado no sistema.');
+      } else if (error.code === 'auth/invalid-email') {
+        setError('Formato de e-mail inválido.');
+      } else {
+        setError('Erro: ' + (error.message || 'Falha desconhecida'));
+      }
     } finally {
       setLoading(false);
     }
