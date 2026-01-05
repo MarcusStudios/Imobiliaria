@@ -1,13 +1,12 @@
 // src/pages/Home.tsx
 import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../services/firebaseConfig"; // Caminho mantido conforme seu envio
+import { db } from "../../services/firebaseConfig"; 
 import { ImovelCard } from "../components/ImovelCard";
 import type { Imovel } from "../types";
 import { Link } from "react-router-dom";
 
-// Não precisamos mais receber props do App.tsx!
 export const Home = () => {
   const [listaImoveis, setListaImoveis] = useState<Imovel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +18,9 @@ export const Home = () => {
     quartos: 0,
     maxPreco: 0,
   });
+
+  // Estado da Ordenação (NOVO)
+  const [ordem, setOrdem] = useState('recente'); // recente, menor_preco, maior_preco
 
   // Busca dados reais do Firebase
   useEffect(() => {
@@ -39,39 +41,38 @@ export const Home = () => {
     fetchImoveis();
   }, []);
 
-  // Lógica de Filtro
+  // 1. Lógica de Filtro
   const imoveisFiltrados = listaImoveis.filter((imovel) => {
-    // 1. Filtro de Texto (Igual)
+    // Texto
     const matchTexto =
       imovel.titulo.toLowerCase().includes(filtros.busca.toLowerCase()) ||
       imovel.endereco.toLowerCase().includes(filtros.busca.toLowerCase()) ||
-      (imovel.bairro &&
-        imovel.bairro.toLowerCase().includes(filtros.busca.toLowerCase())); // Agora busca por bairro também!
+      (imovel.bairro && imovel.bairro.toLowerCase().includes(filtros.busca.toLowerCase()));
 
-    // 2. Filtro de Tipo (Corrigido para aceitar Ambos)
+    // Tipo
     const matchTipo =
       filtros.tipo === "Todos" ||
       imovel.tipo === filtros.tipo ||
       imovel.tipo === "Ambos";
 
-    // 3. Filtro de Preço (AQUI ESTAVA O PROBLEMA)
+    // Preço (Inteligente para 'Ambos')
     let precoParaVerificar = imovel.preco;
-
-    // Se eu estou filtrando por Aluguel, e o imóvel é "Ambos", devo olhar o preço do aluguel!
-    if (
-      filtros.tipo === "Aluguel" &&
-      imovel.tipo === "Ambos" &&
-      imovel.precoAluguel
-    ) {
+    if (filtros.tipo === "Aluguel" && imovel.tipo === "Ambos" && imovel.precoAluguel) {
       precoParaVerificar = imovel.precoAluguel;
     }
+    const matchPreco = filtros.maxPreco === 0 || precoParaVerificar <= filtros.maxPreco;
 
-    const matchPreco =
-      filtros.maxPreco === 0 || precoParaVerificar <= filtros.maxPreco;
-
+    // Quartos
     const matchQuartos = Number(imovel.quartos) >= filtros.quartos;
 
     return matchTexto && matchTipo && matchQuartos && matchPreco;
+  });
+
+  // 2. Lógica de Ordenação (Aplica sobre os filtrados) - NOVO
+  const listaFinal = [...imoveisFiltrados].sort((a, b) => {
+    if (ordem === 'menor_preco') return a.preco - b.preco;
+    if (ordem === 'maior_preco') return b.preco - a.preco;
+    return 0; // recente (ordem original)
   });
 
   return (
@@ -86,52 +87,48 @@ export const Home = () => {
       <div className="container">
         {/* Barra de Filtros */}
         <div className="filter-bar">
+          
+          {/* Busca por Texto */}
           <div className="filter-group" style={{ flex: 2 }}>
             <label>Localização ou Nome</label>
             <div style={{ position: "relative" }}>
-              <Search
-                size={18}
-                style={{
-                  position: "absolute",
-                  left: 10,
-                  top: 12,
-                  color: "#94a3b8",
-                }}
-              />
+              <Search size={18} style={{ position: "absolute", left: 10, top: 12, color: "#94a3b8" }} />
               <input
                 type="text"
                 className="input-control"
                 style={{ paddingLeft: "35px" }}
                 placeholder="Ex: Centro, Apartamento..."
                 value={filtros.busca}
-                onChange={(e) =>
-                  setFiltros({ ...filtros, busca: e.target.value })
-                }
+                onChange={(e) => setFiltros({ ...filtros, busca: e.target.value })}
               />
             </div>
           </div>
 
+          {/* Tipo */}
           <div className="filter-group">
             <label>Finalidade</label>
-            <select
-              className="input-control"
-              value={filtros.tipo}
-              onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
-            >
-              <option value="Todos">Todos</option>
-              <option value="Venda">Comprar</option>
-              <option value="Aluguel">Alugar</option>
-            </select>
+            <div style={{ position: "relative" }}>
+              <Filter size={18} style={{ position: "absolute", left: 10, top: 12, color: "#94a3b8" }} />
+              <select
+                className="input-control"
+                style={{ paddingLeft: "35px" }}
+                value={filtros.tipo}
+                onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
+              >
+                <option value="Todos">Todos</option>
+                <option value="Venda">Comprar</option>
+                <option value="Aluguel">Alugar</option>
+              </select>
+            </div>
           </div>
 
+          {/* Quartos */}
           <div className="filter-group">
             <label>Quartos</label>
             <select
               className="input-control"
               value={filtros.quartos}
-              onChange={(e) =>
-                setFiltros({ ...filtros, quartos: Number(e.target.value) })
-              }
+              onChange={(e) => setFiltros({ ...filtros, quartos: Number(e.target.value) })}
             >
               <option value={0}>Qualquer</option>
               <option value={1}>1+</option>
@@ -139,26 +136,61 @@ export const Home = () => {
               <option value={3}>3+</option>
             </select>
           </div>
+
+          {/* Preço Máximo (NOVO) */}
+          <div className="filter-group">
+            <label>Preço Máximo</label>
+            <input
+              type="number"
+              className="input-control"
+              placeholder="R$ Máximo"
+              value={filtros.maxPreco === 0 ? "" : filtros.maxPreco}
+              onChange={(e) => setFiltros({ ...filtros, maxPreco: Number(e.target.value) })}
+            />
+          </div>
+        </div>
+
+        {/* Barra de Ordenação (NOVO) */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem 0 2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+             <span style={{ fontSize: '0.9rem', color: '#64748b' }}>Ordenar por:</span>
+             <select 
+                value={ordem} 
+                onChange={(e) => setOrdem(e.target.value)}
+                className="input-control"
+                style={{ width: 'auto', padding: '0.5rem', fontSize: '0.9rem', height: 'auto' }}
+             >
+                <option value="recente">Mais Recentes</option>
+                <option value="menor_preco">Menor Preço</option>
+                <option value="maior_preco">Maior Preço</option>
+             </select>
+          </div>
         </div>
 
         {/* Grid de Resultados */}
         {loading ? (
-          <p style={{ textAlign: "center", padding: "2rem" }}>
-            Carregando imóveis...
-          </p>
+          <p style={{ textAlign: "center", padding: "4rem" }}>Carregando imóveis...</p>
         ) : (
           <div className="grid">
-            {imoveisFiltrados.map((imovel) => (
-              // MUDANÇA AQUI: O Card agora só recebe o 'imovel'.
-              // Ele pega os favoritos direto do Contexto.
-              <ImovelCard key={imovel.id} imovel={imovel} />
-            ))}
-
-            {imoveisFiltrados.length === 0 && (
-              <p style={{ gridColumn: "1/-1", textAlign: "center" }}>
-                Nenhum imóvel encontrado. Cadastre um novo em{" "}
-                <Link to="/admin">/admin</Link>
-              </p>
+            {listaFinal.length > 0 ? (
+              // Usa a listaFinal (ordenada)
+              listaFinal.map((imovel) => (
+                <ImovelCard key={imovel.id} imovel={imovel} />
+              ))
+            ) : (
+              // ESTADO VAZIO PROFISSIONAL
+              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "4rem 1rem", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+                <p style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔍</p>
+                <h3 style={{ color: "#334155", marginBottom: "0.5rem" }}>Nenhum imóvel encontrado</h3>
+                <p style={{ color: "#64748b" }}>Tente ajustar seus filtros ou remover algumas restrições.</p>
+                <button
+                  onClick={() => setFiltros({ busca: "", tipo: "Todos", quartos: 0, maxPreco: 0 })}
+                  className="btn-details"
+                  style={{ marginTop: "1rem", background: "var(--secondary)", display: "inline-block", width: "auto" }}
+                >
+                  Limpar Filtros
+                </button>
+              </div>
             )}
           </div>
         )}
