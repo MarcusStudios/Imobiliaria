@@ -26,7 +26,7 @@ export const Detalhes = () => {
   const { isAdmin } = useAuth();
 
   // SEU NÚMERO AQUI
-  const TELEFONE_CORRETORA = "99991954552";
+  const TELEFONE_CORRETORA = "99991243054";
 
   useEffect(() => {
     const fetchImovel = async () => {

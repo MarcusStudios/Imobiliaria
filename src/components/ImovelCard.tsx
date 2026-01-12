@@ -25,6 +25,7 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
       <div className="card-img-wrapper">
         <img src={capa} alt={imovel.titulo} className="card-img" />
         
+        
         {/* Mostra "Venda/Aluguel" se for Ambos, ou o tipo normal */}
         <span className="badge-type">
           {imovel.tipo === 'Ambos' ? 'Venda/Aluguel' : imovel.tipo}

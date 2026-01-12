@@ -51,6 +51,7 @@ export const ImageGallery = ({ images }: ImageGalleryProps) => {
             <img 
               key={idx} 
               src={img} 
+              loading="lazy"
               alt={`thumb-${idx}`} 
               className={`thumb ${currentIndex === idx ? 'thumb-active' : ''}`}
               onClick={() => setCurrentIndex(idx)}
