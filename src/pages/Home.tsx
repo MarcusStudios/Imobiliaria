@@ -5,7 +5,6 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../services/firebaseConfig"; 
 import { ImovelCard } from "../components/ImovelCard";
 import type { Imovel } from "../types";
-import { Link } from "react-router-dom";
 
 export const Home = () => {
   const [listaImoveis, setListaImoveis] = useState<Imovel[]>([]);

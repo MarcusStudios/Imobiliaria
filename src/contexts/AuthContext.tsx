@@ -13,8 +13,11 @@ import {
 interface AuthContextData {
   user: User | null;
   loading: boolean;
-  login: (email: string, pass: string) => Promise<void>;
-  register: (email: string, pass: string) => Promise<void>;
+  // --- AQUI ESTAVA O ERRO ---
+  // Mudamos de Promise<void> para Promise<any> para aceitar o retorno do Firebase
+  login: (email: string, pass: string) => Promise<any>;
+  register: (email: string, pass: string) => Promise<any>;
+  // --------------------------
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   isAdmin: boolean;
