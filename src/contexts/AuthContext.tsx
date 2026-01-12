@@ -1,20 +1,22 @@
 // src/contexts/AuthContext.tsx
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { auth } from '../../services/firebaseConfig';
+import { auth } from '../../services/firebaseConfig'; // Ajuste o caminho se necessário
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut, 
   sendPasswordResetEmail,
   onAuthStateChanged, 
-  type User 
+  type User,
+  type UserCredential // <--- 1. IMPORTANTE: Adicionamos a importação do tipo
 } from 'firebase/auth';
 
 interface AuthContextData {
   user: User | null;
   loading: boolean;
-  login: (email: string, pass: string) => Promise<void>;
-  register: (email: string, pass: string) => Promise<void>;
+  // 2. CORREÇÃO: Mudamos de Promise<void> para Promise<UserCredential>
+  login: (email: string, pass: string) => Promise<UserCredential>;
+  register: (email: string, pass: string) => Promise<UserCredential>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   isAdmin: boolean;
@@ -22,7 +24,7 @@ interface AuthContextData {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-// O email que manda no site
+// Email do administrador
 const ADMIN_EMAIL = "admin@admin.com"; 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -37,6 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
+  // As funções do Firebase retornam automaticamente o UserCredential, 
+  // agora a interface aceita isso.
   const login = (email: string, pass: string) => signInWithEmailAndPassword(auth, email, pass);
   
   const register = (email: string, pass: string) => createUserWithEmailAndPassword(auth, email, pass);
