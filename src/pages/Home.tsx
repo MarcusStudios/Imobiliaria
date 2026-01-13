@@ -263,6 +263,7 @@ export const Home = () => {
                   }}
                 >
                   Limpar Filtros
+                  
                 </button>
               </div>
             )}
