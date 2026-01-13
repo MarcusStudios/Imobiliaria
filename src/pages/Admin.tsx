@@ -1,238 +1,220 @@
 // src/pages/Admin.tsx
-import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { db } from '../../services/firebaseConfig';
-import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { useNavigate, useParams } from 'react-router-dom';
-import type { Imovel } from '../types';
+import { 
+  collection, 
+  getDocs, 
+  deleteDoc, 
+  doc, 
+  updateDoc 
+} from 'firebase/firestore';
+// Removido: useParams, useNavigate (se não for usado), addDoc
+import { Link } from 'react-router-dom'; 
+import { 
+  Plus, 
+  Trash2, 
+  Eye, 
+  EyeOff, 
+  MapPin, 
+  DollarSign,
+  Edit // Adicionei o ícone de edição para ficar bonito
+} from 'lucide-react';
+
+// Interface simplificada apenas para o que usamos na LISTA
+interface Imovel {
+  id: string;
+  titulo: string;
+  preco: number; // ou string, dependendo de como salvou
+  endereco: string;
+  imagens: string[];
+  ativo?: boolean;
+}
 
 export const Admin = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const [loading, setLoading] = useState(false);
+  const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [formData, setFormData] = useState<Omit<Imovel, 'id'>>({
-    titulo: '', descricao: '', tipo: 'Venda',
-    preco: 0, precoAluguel: 0,
-    endereco: '', bairro: '', cidade: 'Primavera do Leste',
-    area: 0, quartos: 0, suites: 0, banheiros: 0, vagas: 0,
-    condominio: 0, iptu: 0,
-    piscina: false, churrasqueira: false, elevador: false,
-    mobiliado: false, portaria: false, aceitaPet: false,
-    imagens: [], 
-    lat: -15.5518, lng: -54.2980
-  });
-
-  useEffect(() => {
-    if (id) {
-      const carregarDados = async () => {
-        setLoading(true);
-        try {
-          const docSnap = await getDoc(doc(db, "imoveis", id));
-          if (docSnap.exists()) {
-            const data = docSnap.data() as Imovel;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { id: idIgnorado, ...dadosSemId } = data;
-            setFormData(dadosSemId);
-          } else {
-            alert("Imóvel não encontrado!");
-            navigate('/admin');
-          }
-        } catch (error) {
-          console.error("Erro ao buscar:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      carregarDados();
-    }
-  }, [id, navigate]);
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    const isNumber = ['preco', 'precoAluguel', 'area', 'quartos', 'banheiros', 'suites', 'vagas', 'condominio', 'iptu', 'lat', 'lng'].includes(name);
-    setFormData(prev => ({ ...prev, [name]: isNumber ? Number(value) : value }));
-  };
-
-  const handleCheck = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData(prev => ({ ...prev, [name]: checked }));
-  };
-
- ;
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  // Buscar imóveis
+  const fetchImoveis = async () => {
     try {
-      const dadosFinais = { ...formData };
-      if (dadosFinais.tipo !== 'Ambos') dadosFinais.precoAluguel = 0;
-
-      if (id) {
-        await updateDoc(doc(db, "imoveis", id), dadosFinais);
-        alert("Imóvel atualizado com sucesso!");
-      } else {
-        await addDoc(collection(db, "imoveis"), dadosFinais);
-        alert("Imóvel cadastrado com sucesso!");
-      }
-      navigate('/');
-    } catch (error) { 
-      console.error("Erro ao salvar:", error);
-      const msg = error instanceof Error ? error.message : "Erro desconhecido";
-      alert("Erro ao salvar: " + msg);
+      const querySnapshot = await getDocs(collection(db, "imoveis"));
+      const lista = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Imovel[];
+      setImoveis(lista);
+    } catch (error) {
+      console.error("Erro ao buscar imóveis:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchImoveis();
+  }, []);
+
+  // Função: APAGAR
+  const handleDelete = async (id: string) => {
+    const confirm = window.confirm("Tem certeza que deseja excluir? Essa ação é permanente.");
+    if (!confirm) return;
+
+    try {
+      await deleteDoc(doc(db, "imoveis", id));
+      setImoveis(imoveis.filter(imovel => imovel.id !== id));
+    } catch (error) {
+      console.error("Erro ao excluir:", error);
+      alert("Erro ao excluir.");
+    }
+  };
+
+  // Função: VISIBILIDADE
+  const handleToggleStatus = async (id: string, statusAtual?: boolean) => {
+    try {
+      const novoStatus = !statusAtual; // Inverte
+      // Atualiza no banco
+      await updateDoc(doc(db, "imoveis", id), {
+        ativo: novoStatus
+      });
+
+      // Atualiza na tela sem recarregar
+      setImoveis(imoveis.map(imovel => 
+        imovel.id === id ? { ...imovel, ativo: novoStatus } : imovel
+      ));
+
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+    }
+  };
+
+  if (loading) return (
+    <div style={{display:'flex', justifyContent:'center', padding:'4rem', color:'#64748b'}}>
+      Carregando painel...
+    </div>
+  );
+
   return (
-    <div className="container" style={{ padding: '2rem 0', maxWidth: '900px' }}>
-      <h1>{id ? "✏️ Editar Imóvel" : "🏠 Cadastrar Novo Imóvel"}</h1>
+    <div className="container" style={{ padding: '2rem 1rem' }}>
       
-      <div className="card" style={{ padding: '2rem', marginTop: '1rem', border: 'none', boxShadow: 'none', background: 'transparent' }}>
-        <form onSubmit={handleSubmit} style={{ display: 'grid' }}>
-          
-          <section>
-            <h3>Informações Principais</h3>
-            <div style={{ display: 'grid', gap: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h2>Painel Administrativo</h2>
+      </div>
+
+      {/* Botão de Adicionar leva para a NOVA página de cadastro */}
+      <Link 
+        to="/cadastro-imovel" 
+        className="btn-details"
+        style={{ 
+          display: 'inline-flex', 
+          alignItems: 'center', 
+          gap: '8px', 
+          marginBottom: '2rem',
+          textDecoration: 'none',
+          background: 'var(--primary)',
+          color: 'white'
+        }}
+      >
+        <Plus size={20} /> Adicionar Novo Imóvel
+      </Link>
+
+      <div className="admin-grid" style={{ display: 'grid', gap: '1rem' }}>
+        {imoveis.map((imovel) => (
+          <div 
+            key={imovel.id} 
+            className="card"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              padding: '1rem',
+              opacity: imovel.ativo === false ? 0.6 : 1,
+              background: imovel.ativo === false ? '#f1f5f9' : 'white',
+              borderLeft: imovel.ativo === false ? '4px solid #94a3b8' : '4px solid #22c55e'
+            }}
+          >
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <img 
+                src={imovel.imagens?.[0] || 'https://via.placeholder.com/100'} 
+                alt="Capa" 
+                style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
+              />
               <div>
-                <label className="label">Título</label>
-                <input 
-                  name="titulo" 
-                  value={formData.titulo} 
-                  onChange={handleChange} 
-                  className="input-control" 
-                  required 
-                  placeholder="Ex: Apartamento no Centro com Vista" 
-                />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <label className="label">Finalidade</label>
-                  <select name="tipo" value={formData.tipo} onChange={handleChange} className="input-control">
-                    <option value="Venda">Venda</option>
-                    <option value="Aluguel">Aluguel</option>
-                    <option value="Ambos">Ambos</option>
-                  </select>
+                <h4 style={{ margin: 0, fontSize: '1rem' }}>{imovel.titulo}</h4>
+                <div style={{ fontSize: '0.85rem', color: '#64748b', display: 'flex', flexDirection:'column', gap: '2px', marginTop: '4px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <DollarSign size={12} /> {imovel.preco}
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <MapPin size={12} /> {imovel.endereco}
+                  </span>
                 </div>
-                <div>
-                  <label className="label">{formData.tipo === 'Aluguel' ? 'Aluguel (R$)' : 'Venda (R$)'}</label>
-                  <input 
-                    name="preco" 
-                    type="number" 
-                    value={formData.preco || ''} 
-                    onChange={handleChange} 
-                    className="input-control" 
-                    required 
-                    placeholder="Ex: 350000"
-                  />
-                </div>
-                {formData.tipo === 'Ambos' && (
-                  <div>
-                    <label className="label">Aluguel (R$)</label>
-                    <input 
-                      name="precoAluguel" 
-                      type="number" 
-                      value={formData.precoAluguel || ''} 
-                      onChange={handleChange} 
-                      className="input-control" 
-                      required 
-                      placeholder="Ex: 2500"
-                    />
-                  </div>
+                {imovel.ativo === false && (
+                  <span style={{ fontSize: '0.7rem', background: '#94a3b8', color: 'white', padding: '2px 6px', borderRadius: '4px', marginTop:'4px', display:'inline-block' }}>
+                    RASCUNHO
+                  </span>
                 )}
               </div>
             </div>
-          </section>
 
-          <section>
-             <h3>Localização</h3>
-             <div style={{ display: 'grid', gap: '1rem' }}>
-                <div>
-                  <label className="label">Endereço</label>
-                  <input 
-                    name="endereco" 
-                    value={formData.endereco} 
-                    onChange={handleChange} 
-                    className="input-control" 
-                    required 
-                    placeholder="Ex: Rua das Palmeiras, 123"
-                  />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                   <div>
-                     <label className="label">Bairro</label>
-                     <input 
-                       name="bairro" 
-                       value={formData.bairro} 
-                       onChange={handleChange} 
-                       className="input-control" 
-                       required 
-                       placeholder="Ex: Jardim Imperial"
-                     />
-                   </div>
-                   <div>
-                     <label className="label">Cidade</label>
-                     <input 
-                       name="cidade" 
-                       value={formData.cidade} 
-                       onChange={handleChange} 
-                       className="input-control" 
-                       placeholder="Ex: Primavera do Leste"
-                     />
-                   </div>
-                </div>
-                
-             </div>
-          </section>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              
+              {/* Botão EDITAR (Leva para a página de edição) */}
+              <Link
+                to={`/editar/${imovel.id}`}
+                title="Editar"
+                style={{
+                  background: 'none',
+                  border: '1px solid #e2e8f0',
+                  padding: '8px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  color: '#3b82f6',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+              >
+                <Edit size={20} />
+              </Link>
 
-          <section>
-            <h3>Detalhes</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem' }}>
-              <div><label className="label">Área (m²)</label><input name="area" type="number" value={formData.area || ''} onChange={handleChange} className="input-control" placeholder="Ex: 120" /></div>
-              <div><label className="label">Quartos</label><input name="quartos" type="number" value={formData.quartos || ''} onChange={handleChange} className="input-control" placeholder="Ex: 3" /></div>
-              <div><label className="label">Suítes</label><input name="suites" type="number" value={formData.suites || ''} onChange={handleChange} className="input-control" placeholder="Ex: 1" /></div>
-              <div><label className="label">Banh.</label><input name="banheiros" type="number" value={formData.banheiros || ''} onChange={handleChange} className="input-control" placeholder="Ex: 2" /></div>
-              <div><label className="label">Vagas</label><input name="vagas" type="number" value={formData.vagas || ''} onChange={handleChange} className="input-control" placeholder="Ex: 2" /></div>
+              {/* Botão OLHO (Publicar/Ocultar) */}
+              <button
+                onClick={() => handleToggleStatus(imovel.id, imovel.ativo ?? true)}
+                title={imovel.ativo === false ? "Publicar" : "Ocultar"}
+                style={{
+                  background: 'none',
+                  border: '1px solid #e2e8f0',
+                  padding: '8px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  color: imovel.ativo === false ? '#64748b' : '#10b981',
+                }}
+              >
+                {imovel.ativo === false ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+
+              {/* Botão LIXO (Excluir) */}
+              <button
+                onClick={() => handleDelete(imovel.id)}
+                title="Excluir"
+                style={{
+                  background: '#fee2e2',
+                  border: 'none',
+                  padding: '8px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  color: '#ef4444',
+                }}
+              >
+                <Trash2 size={20} />
+              </button>
             </div>
-          </section>
+          </div>
+        ))}
 
-          <section>
-             <h3>Custos Extras</h3>
-             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div><label className="label">Condomínio (R$)</label><input name="condominio" type="number" value={formData.condominio || ''} onChange={handleChange} className="input-control" placeholder="Ex: 450" /></div>
-                <div><label className="label">IPTU (R$)</label><input name="iptu" type="number" value={formData.iptu || ''} onChange={handleChange} className="input-control" placeholder="Ex: 1200" /></div>
-             </div>
-          </section>
-
-          <section>
-            <h3>Comodidades</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem' }}>
-              <label style={{display:'flex', gap:'8px', alignItems:'center', cursor:'pointer'}}><input type="checkbox" name="piscina" checked={formData.piscina} onChange={handleCheck} style={{width:'18px', height:'18px'}} /> Piscina</label>
-              <label style={{display:'flex', gap:'8px', alignItems:'center', cursor:'pointer'}}><input type="checkbox" name="churrasqueira" checked={formData.churrasqueira} onChange={handleCheck} style={{width:'18px', height:'18px'}} /> Churrasqueira</label>
-              <label style={{display:'flex', gap:'8px', alignItems:'center', cursor:'pointer'}}><input type="checkbox" name="elevador" checked={formData.elevador} onChange={handleCheck} style={{width:'18px', height:'18px'}} /> Elevador</label>
-              <label style={{display:'flex', gap:'8px', alignItems:'center', cursor:'pointer'}}><input type="checkbox" name="mobiliado" checked={formData.mobiliado} onChange={handleCheck} style={{width:'18px', height:'18px'}} /> Mobiliado</label>
-              <label style={{display:'flex', gap:'8px', alignItems:'center', cursor:'pointer'}}><input type="checkbox" name="portaria" checked={formData.portaria} onChange={handleCheck} style={{width:'18px', height:'18px'}} /> Portaria</label>
-              <label style={{display:'flex', gap:'8px', alignItems:'center', cursor:'pointer'}}><input type="checkbox" name="aceitaPet" checked={formData.aceitaPet} onChange={handleCheck} style={{width:'18px', height:'18px'}} /> Aceita Pet</label>
-            </div>
-          </section>
-
-          <section>
-            <label className="label">Descrição</label>
-            <textarea 
-              name="descricao" 
-              rows={6} 
-              value={formData.descricao} 
-              onChange={handleChange} 
-              className="input-control" 
-              style={{height: 'auto'}}
-              placeholder="Ex: Imóvel recém reformado, próximo a escolas e supermercados. Possui acabamento em porcelanato..." 
-            />
-          </section>
-
-          <button type="submit" className="btn-details" style={{ background: 'var(--primary)', color: 'white', marginTop:'1rem' }} disabled={loading}>
-            {loading ? "Salvando..." : "✅ Salvar Imóvel"}
-          </button>
-        </form>
+        {imoveis.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+            Nenhum imóvel encontrado. Clique em "Adicionar" para começar.
+          </div>
+        )}
       </div>
     </div>
   );

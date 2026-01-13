@@ -38,11 +38,11 @@ body {
 .header {
   position: sticky; top: 0; z-index: 1000;
   background: rgba(255, 0, 0, 0.95);
-  border-bottom: 2px solid #e2e8f0; /* Borda inferior mais grossa */
+  border-bottom: 4px solid #e2e8f0; /* Borda inferior mais grossa */
   padding: 0.8rem 0;
   box-shadow: var(--shadow-lg);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(187%) blur(20px);
+  
 }
 .header-content { display: flex; align-items: center; justify-content: space-between; }
 .logo {

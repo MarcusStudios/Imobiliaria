@@ -3,6 +3,8 @@ export interface Imovel {
   titulo: string;
   tipo: 'Venda' | 'Aluguel' | 'Ambos';
   
+  ativo?: boolean;
+
   preco: number;          // Preço principal (Venda OU Aluguel se for único)
   precoAluguel?: number;  // NOVO: Preço específico de aluguel para caso "Ambos"
   

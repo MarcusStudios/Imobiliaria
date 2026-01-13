@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Search, Filter } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../services/firebaseConfig"; 
+import { db } from "../../services/firebaseConfig";
 import { ImovelCard } from "../components/ImovelCard";
 import type { Imovel } from "../types";
 
@@ -19,7 +19,7 @@ export const Home = () => {
   });
 
   // Estado da Ordenação (NOVO)
-  const [ordem, setOrdem] = useState('recente'); // recente, menor_preco, maior_preco
+  const [ordem, setOrdem] = useState("recente"); // recente, menor_preco, maior_preco
 
   // Busca dados reais do Firebase
   useEffect(() => {
@@ -30,7 +30,13 @@ export const Home = () => {
           id: doc.id,
           ...doc.data(),
         })) as Imovel[];
-        setListaImoveis(data);
+
+        // --- MUDANÇA AQUI: Filtra para mostrar apenas os ativos ---
+        // Se 'ativo' for undefined (imóveis antigos) ou true, ele mostra.
+        // Se for false (você ocultou no admin), ele esconde.
+        const imoveisAtivos = data.filter((imovel) => imovel.ativo !== false);
+
+        setListaImoveis(imoveisAtivos);
       } catch (error) {
         console.error("Erro ao buscar imóveis:", error);
       } finally {
@@ -46,7 +52,8 @@ export const Home = () => {
     const matchTexto =
       imovel.titulo.toLowerCase().includes(filtros.busca.toLowerCase()) ||
       imovel.endereco.toLowerCase().includes(filtros.busca.toLowerCase()) ||
-      (imovel.bairro && imovel.bairro.toLowerCase().includes(filtros.busca.toLowerCase()));
+      (imovel.bairro &&
+        imovel.bairro.toLowerCase().includes(filtros.busca.toLowerCase()));
 
     // Tipo
     const matchTipo =
@@ -56,10 +63,15 @@ export const Home = () => {
 
     // Preço (Inteligente para 'Ambos')
     let precoParaVerificar = imovel.preco;
-    if (filtros.tipo === "Aluguel" && imovel.tipo === "Ambos" && imovel.precoAluguel) {
+    if (
+      filtros.tipo === "Aluguel" &&
+      imovel.tipo === "Ambos" &&
+      imovel.precoAluguel
+    ) {
       precoParaVerificar = imovel.precoAluguel;
     }
-    const matchPreco = filtros.maxPreco === 0 || precoParaVerificar <= filtros.maxPreco;
+    const matchPreco =
+      filtros.maxPreco === 0 || precoParaVerificar <= filtros.maxPreco;
 
     // Quartos
     const matchQuartos = Number(imovel.quartos) >= filtros.quartos;
@@ -69,8 +81,8 @@ export const Home = () => {
 
   // 2. Lógica de Ordenação (Aplica sobre os filtrados) - NOVO
   const listaFinal = [...imoveisFiltrados].sort((a, b) => {
-    if (ordem === 'menor_preco') return a.preco - b.preco;
-    if (ordem === 'maior_preco') return b.preco - a.preco;
+    if (ordem === "menor_preco") return a.preco - b.preco;
+    if (ordem === "maior_preco") return b.preco - a.preco;
     return 0; // recente (ordem original)
   });
 
@@ -86,19 +98,28 @@ export const Home = () => {
       <div className="container">
         {/* Barra de Filtros */}
         <div className="filter-bar">
-          
           {/* Busca por Texto */}
           <div className="filter-group" style={{ flex: 2 }}>
             <label>Localização ou Nome</label>
             <div style={{ position: "relative" }}>
-              <Search size={18} style={{ position: "absolute", left: 10, top: 12, color: "#94a3b8" }} />
+              <Search
+                size={18}
+                style={{
+                  position: "absolute",
+                  left: 10,
+                  top: 12,
+                  color: "#94a3b8",
+                }}
+              />
               <input
                 type="text"
                 className="input-control"
                 style={{ paddingLeft: "35px" }}
                 placeholder="Ex: Centro, Apartamento..."
                 value={filtros.busca}
-                onChange={(e) => setFiltros({ ...filtros, busca: e.target.value })}
+                onChange={(e) =>
+                  setFiltros({ ...filtros, busca: e.target.value })
+                }
               />
             </div>
           </div>
@@ -107,12 +128,22 @@ export const Home = () => {
           <div className="filter-group">
             <label>Finalidade</label>
             <div style={{ position: "relative" }}>
-              <Filter size={18} style={{ position: "absolute", left: 10, top: 12, color: "#94a3b8" }} />
+              <Filter
+                size={18}
+                style={{
+                  position: "absolute",
+                  left: 10,
+                  top: 12,
+                  color: "#94a3b8",
+                }}
+              />
               <select
                 className="input-control"
                 style={{ paddingLeft: "35px" }}
                 value={filtros.tipo}
-                onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
+                onChange={(e) =>
+                  setFiltros({ ...filtros, tipo: e.target.value })
+                }
               >
                 <option value="Todos">Todos</option>
                 <option value="Venda">Comprar</option>
@@ -127,7 +158,9 @@ export const Home = () => {
             <select
               className="input-control"
               value={filtros.quartos}
-              onChange={(e) => setFiltros({ ...filtros, quartos: Number(e.target.value) })}
+              onChange={(e) =>
+                setFiltros({ ...filtros, quartos: Number(e.target.value) })
+              }
             >
               <option value={0}>Qualquer</option>
               <option value={1}>1+</option>
@@ -144,31 +177,48 @@ export const Home = () => {
               className="input-control"
               placeholder="R$ Máximo"
               value={filtros.maxPreco === 0 ? "" : filtros.maxPreco}
-              onChange={(e) => setFiltros({ ...filtros, maxPreco: Number(e.target.value) })}
+              onChange={(e) =>
+                setFiltros({ ...filtros, maxPreco: Number(e.target.value) })
+              }
             />
           </div>
         </div>
 
         {/* Barra de Ordenação (NOVO) */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem 0 2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-             <span style={{ fontSize: '0.9rem', color: '#64748b' }}>Ordenar por:</span>
-             <select 
-                value={ordem} 
-                onChange={(e) => setOrdem(e.target.value)}
-                className="input-control"
-                style={{ width: 'auto', padding: '0.5rem', fontSize: '0.9rem', height: 'auto' }}
-             >
-                <option value="recente">Mais Recentes</option>
-                <option value="menor_preco">Menor Preço</option>
-                <option value="maior_preco">Maior Preço</option>
-             </select>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            margin: "1rem 0 2rem",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "0.9rem", color: "#64748b" }}>
+              Ordenar por:
+            </span>
+            <select
+              value={ordem}
+              onChange={(e) => setOrdem(e.target.value)}
+              className="input-control"
+              style={{
+                width: "auto",
+                padding: "0.5rem",
+                fontSize: "0.9rem",
+                height: "auto",
+              }}
+            >
+              <option value="recente">Mais Recentes</option>
+              <option value="menor_preco">Menor Preço</option>
+              <option value="maior_preco">Maior Preço</option>
+            </select>
           </div>
         </div>
 
         {/* Grid de Resultados */}
         {loading ? (
-          <p style={{ textAlign: "center", padding: "4rem" }}>Carregando imóveis...</p>
+          <p style={{ textAlign: "center", padding: "4rem" }}>
+            Carregando imóveis...
+          </p>
         ) : (
           <div className="grid">
             {listaFinal.length > 0 ? (
@@ -178,14 +228,39 @@ export const Home = () => {
               ))
             ) : (
               // ESTADO VAZIO PROFISSIONAL
-              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "4rem 1rem", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  textAlign: "center",
+                  padding: "4rem 1rem",
+                  background: "#f8fafc",
+                  borderRadius: "12px",
+                  border: "1px dashed #cbd5e1",
+                }}
+              >
                 <p style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔍</p>
-                <h3 style={{ color: "#334155", marginBottom: "0.5rem" }}>Nenhum imóvel encontrado</h3>
-                <p style={{ color: "#64748b" }}>Tente ajustar seus filtros ou remover algumas restrições.</p>
+                <h3 style={{ color: "#334155", marginBottom: "0.5rem" }}>
+                  Nenhum imóvel encontrado
+                </h3>
+                <p style={{ color: "#64748b" }}>
+                  Tente ajustar seus filtros ou remover algumas restrições.
+                </p>
                 <button
-                  onClick={() => setFiltros({ busca: "", tipo: "Todos", quartos: 0, maxPreco: 0 })}
+                  onClick={() =>
+                    setFiltros({
+                      busca: "",
+                      tipo: "Todos",
+                      quartos: 0,
+                      maxPreco: 0,
+                    })
+                  }
                   className="btn-details"
-                  style={{ marginTop: "1rem", background: "var(--secondary)", display: "inline-block", width: "auto" }}
+                  style={{
+                    marginTop: "1rem",
+                    background: "var(--secondary)",
+                    display: "inline-block",
+                    width: "auto",
+                  }}
                 >
                   Limpar Filtros
                 </button>

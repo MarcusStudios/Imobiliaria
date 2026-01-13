@@ -26,7 +26,7 @@ export const Detalhes = () => {
   const { isAdmin } = useAuth();
 
   // SEU NÚMERO AQUI
-  const TELEFONE_CORRETORA = "99991243054";
+  const TELEFONE_CORRETORA = "+5599991243054";
 
   useEffect(() => {
     const fetchImovel = async () => {
@@ -49,11 +49,11 @@ export const Detalhes = () => {
 
   useEffect(() => {
     if (imovel) {
-      document.title = `${imovel.titulo} | Lidiane Corretora`;
+      document.title = `${imovel.titulo} | Lidiany Lopes Corretora`;
     }
     // Quando sair da página, volta ao normal
     return () => {
-      document.title = "Lidiane Corretora de Imóveis";
+      document.title = "Lidiany Lopes Corretora de Imóveis";
     };
   }, [imovel]);
 
@@ -81,7 +81,7 @@ export const Detalhes = () => {
       ? imovel.imagens
       : ["https://via.placeholder.com/800x400?text=Sem+Foto"];
 
-  const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiane! Vi o imóvel "${
+  const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiany! Vi o imóvel "${
     imovel.titulo
   }" (Ref: ${id?.slice(0, 4)}) e gostaria de mais detalhes.`;
 
