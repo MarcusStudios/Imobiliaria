@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   AlertTriangle,
+  Instagram,
 } from "lucide-react";
 import "./css/App.css";
 
@@ -255,17 +256,44 @@ function App() {
               Realizando sonhos e conectando pessoas aos seus lares ideais em
               Açailândia e Região.
             </p>
+              <p style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>
+              Seu parceiro confiável no mercado imobiliário. V2.1
+              </p>
+
+              <p style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>
+              Desenvolvido por Marcus Eduardo.
+              </p>
           </div>
 
           <div>
             <h4 style={{ color: "white", marginBottom: "1rem" }}>
               Fale Conosco
             </h4>
-            <p style={{ marginBottom: "0.5rem" }}>
-              📍 Rua Exemplo, 123 - Centro
-            </p>
+            
+            {/* Endereço removido */}
+            
             <p style={{ marginBottom: "0.5rem" }}>📞 (99) 99124-3054</p>
-            <p>✉️ moriaimoveis.atendimento@gmail.com.br</p>
+            <p style={{ marginBottom: "1rem" }}>✉️ moriaimoveis.atendimento@gmail.com.br</p>
+
+            {/* Link do Instagram Adicionado */}
+            <a 
+              href="https://www.instagram.com/moriaimoveis10/" /* <--- TROQUE PELO SEU LINK */
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px', 
+                color: '#E1306C', /* Cor rosa do Instagram (ou use 'white' se preferir) */
+                textDecoration: 'none',
+                fontWeight: 'bold',
+                transition: 'opacity 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              <Instagram size={20} /> moriaimoveis10
+            </a>
           </div>
 
           <div>
