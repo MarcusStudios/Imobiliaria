@@ -16,6 +16,7 @@ import "./css/App.css";
 
 import { Home } from "./pages/Home";
 
+import { WhatsAppButton } from './components/WhatsAppButton';
 // Imports com Lazy Loading (Carregamento sob demanda)
 const Admin = lazy(() =>
   import("./pages/Admin").then((module) => ({ default: module.Admin }))
@@ -23,9 +24,15 @@ const Admin = lazy(() =>
 const Detalhes = lazy(() =>
   import("./pages/Detalhes").then((module) => ({ default: module.Detalhes }))
 );
+
+const Perfil = lazy(() =>
+  import("./pages/Perfil").then((module) => ({ default: module.Perfil }))
+);
+
 const Favoritos = lazy(() =>
   import("./pages/Favoritos").then((module) => ({ default: module.Favoritos }))
 );
+
 const Login = lazy(() =>
   import("./pages/Login").then((module) => ({ default: module.Login }))
 );
@@ -104,6 +111,11 @@ const Header = () => {
             <Link to="/favoritos" className="nav-link" onClick={closeMenu}>
               Favoritos{" "}
               {count > 0 && <span className="fav-count">{count}</span>}
+            </Link>
+
+            <Link to="/perfil" className="nav-link" onClick={closeMenu}>
+              Perfil
+              {user && <User size={18} />}
             </Link>
 
             {isAdmin && (
@@ -190,6 +202,7 @@ function App() {
           <Route path="/favoritos" element={<Favoritos />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/perfil" element={<Perfil />} />
           <Route path="/recuperar-senha" element={<RecuperarSenha />} />
 
           {/* ROTAS PROTEGIDAS DO ADMIN */}
@@ -260,9 +273,7 @@ function App() {
               Seu parceiro confiável no mercado imobiliário. V2.1
             </p>
 
-            <p style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>
-              Desenvolvido por Marcus Eduardo.
-            </p>
+            
           </div>
 
           <div>
@@ -354,9 +365,14 @@ function App() {
               © 2026 Lidiany Lopes Corretora.
               <br />
               Todos os direitos reservados.
+              
+            </p>
+            <p style={{ marginTop: "0.5rem", fontSize: "0.8rem" }}>
+              Desenvolvido por Marcus Eduardo.
             </p>
           </div>
         </div>
+        <WhatsAppButton />
       </footer>
     </div>
   );

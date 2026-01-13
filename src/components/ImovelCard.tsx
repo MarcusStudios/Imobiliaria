@@ -9,15 +9,17 @@ interface ImovelCardProps {
 }
   
 export const ImovelCard = ({ imovel }: ImovelCardProps) => {
-  const { favoritos, toggleFavorito } = useFavoritos();
-  const isFav = favoritos.includes(imovel.id);
+  // CORREÇÃO 1: Pegamos 'isFavorito' (função auxiliar) e 'toggleFavorito'
+  const { toggleFavorito, isFavorito } = useFavoritos();
+  
+  // CORREÇÃO 2: Usamos a função auxiliar para checar pelo ID (já que 'favoritos' agora é uma lista de objetos)
+  const isFav = isFavorito(imovel.id);
 
-  // Proteção de imagem (Pega a primeira ou usa placeholder)
+  // Proteção de imagem
   const capa = imovel.imagens && imovel.imagens.length > 0 
     ? imovel.imagens[0] 
     : "https://via.placeholder.com/400x300?text=Sem+Foto";
 
-  // Função auxiliar para formatar dinheiro (R$)
   const formatar = (val: number) => Number(val).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   return (
@@ -25,8 +27,6 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
       <div className="card-img-wrapper">
         <img src={capa} alt={imovel.titulo} className="card-img" />
         
-        
-        {/* Mostra "Venda/Aluguel" se for Ambos, ou o tipo normal */}
         <span className="badge-type">
           {imovel.tipo === 'Ambos' ? 'Venda/Aluguel' : imovel.tipo}
         </span>
@@ -34,8 +34,9 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
         <button 
           className={`btn-fav ${isFav ? "active" : ""}`}
           onClick={(e) => {
-            e.preventDefault();
-            toggleFavorito(imovel.id);
+            e.preventDefault(); // Não abrir o link do card
+            // CORREÇÃO 3: Passamos o objeto 'imovel' INTEIRO para a função, não apenas o ID
+            toggleFavorito(imovel); 
           }}
           title={isFav ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
@@ -46,8 +47,7 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
       <div className="card-body">
         <h3 className="card-title">{imovel.titulo}</h3>
         
-        {/* --- LÓGICA DE PREÇO ATUALIZADA --- */}
-        {/* Se for "Ambos", mostra os dois preços. Se não, mostra grande normal. */}
+        {/* Lógica de Preço (Mantida a original que você enviou) */}
         <div className="card-price" style={{ minHeight: '3.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {imovel.tipo === 'Ambos' ? (
             <>
@@ -56,7 +56,7 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
               </div>
               {imovel.precoAluguel && (
                 <div style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                  Aluguel: <span style={{ fontWeight: 700, color: 'var(--success)' }}>{formatar(imovel.precoAluguel)}</span>
+                  Aluguel: <span style={{ fontWeight: 700, color: '#16a34a' }}>{formatar(imovel.precoAluguel)}</span>
                 </div>
               )}
             </>
@@ -64,7 +64,6 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
             <span style={{ fontSize: '1.25rem' }}>{formatar(imovel.preco)}</span>
           )}
         </div>
-        {/* ---------------------------------- */}
 
         <p className="address" style={{ fontSize: "0.9rem", color: "#64748b", marginBottom: "10px", marginTop: "5px" }}>
           <MapPin size={14} style={{ display: "inline", marginRight: "4px" }} />

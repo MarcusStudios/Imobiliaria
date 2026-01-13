@@ -1,58 +1,39 @@
-import { useState, useEffect } from 'react';
+// src/pages/Favoritos.tsx
 import { Link } from 'react-router-dom';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../services/firebaseConfig'; // Ajuste se necessário
-import type { Imovel } from '../types';
-import { ImovelCard } from '../components/ImovelCard'; // <--- Reutilize o Card!
-import { useFavoritos } from '../contexts/FavoritosContext'; // <--- Contexto
+import { ArrowLeft } from 'lucide-react';
+import { ImovelCard } from '../components/ImovelCard';
+import { useFavoritos } from '../contexts/FavoritosContext';
 
 export const Favoritos = () => {
-  const { favoritos } = useFavoritos(); // <--- Pega IDs do contexto
-  const [listaFavoritos, setListaFavoritos] = useState<Imovel[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchFavoritos = async () => {
-      if (favoritos.length === 0) {
-        setListaFavoritos([]);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        // Busca simples (Melhoria futura: usar query 'in' do firebase para trazer só os necessários)
-        const querySnapshot = await getDocs(collection(db, "imoveis"));
-        const todos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Imovel));
-        
-        // Filtra
-        const apenasFavs = todos.filter(imovel => favoritos.includes(imovel.id));
-        setListaFavoritos(apenasFavs);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFavoritos();
-  }, [favoritos]); // Recarrega se a lista de favoritos mudar
-
-  if (loading) return <div className="container" style={{padding:'2rem'}}>Carregando...</div>;
+  // O contexto já nos dá a lista de imóveis completa (Imovel[])
+  // Não precisamos mais buscar no banco de dados aqui!
+  const { favoritos } = useFavoritos();
 
   return (
-    <div className="container" style={{ padding: '2rem 0' }}>
-      <h1>Meus Favoritos ❤️</h1>
-      {listaFavoritos.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+    <div className="container" style={{ padding: '2rem 1rem' }}>
+      
+      {/* Cabeçalho com botão de voltar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+        <Link to="/" style={{ color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', fontWeight: 600 }}>
+          <ArrowLeft size={20} /> Voltar
+        </Link>
+        <h1 style={{ fontSize: '1.8rem', margin: 0 }}>Meus Favoritos ❤️</h1>
+      </div>
+
+      {favoritos.length === 0 ? (
+        // --- ESTADO VAZIO ---
+        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#64748b' }}>
           <h3>Você ainda não tem favoritos.</h3>
-          <Link to="/" className="btn-details" style={{ display: 'inline-block', width: 'auto', marginTop: '1rem' }}>
+          <p style={{ marginTop: '0.5rem' }}>Que tal explorar alguns imóveis e salvar os que mais gostar?</p>
+          <Link to="/" className="btn-details" style={{ display: 'inline-block', width: 'auto', marginTop: '1.5rem', padding: '0.8rem 2rem' }}>
             Explorar Imóveis
           </Link>
         </div>
       ) : (
-        <div className="grid">
-          {listaFavoritos.map(imovel => (
-             // Reutilizando o componente Card, ele já vem com o botão de coração funcionando
+        // --- LISTA DE FAVORITOS ---
+        // Usamos a mesma classe de grid da Home para manter o padrão visual
+        <div className="imoveis-grid">
+          {favoritos.map((imovel) => (
              <ImovelCard key={imovel.id} imovel={imovel} />
           ))}
         </div>

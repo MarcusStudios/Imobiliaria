@@ -1,19 +1,25 @@
+// src/types.ts
+
 export interface Imovel {
   id: string;
   titulo: string;
-  tipo: 'Venda' | 'Aluguel' | 'Ambos';
+  tipo: 'Venda' | 'Aluguel' | 'Ambos'; // Tipagem estrita ajuda a evitar erros de digitação
   
-  ativo?: boolean;
+  // Controle de Rascunho vs Publicado
+  ativo?: boolean; 
 
-  preco: number;          // Preço principal (Venda OU Aluguel se for único)
-  precoAluguel?: number;  // NOVO: Preço específico de aluguel para caso "Ambos"
+  // Valores
+  preco: number;          // Preço de Venda (ou Aluguel se for só aluguel)
+  precoAluguel?: number;  // Preço secundário caso o imóvel seja "Ambos"
   
+  // Localização
   endereco: string;
   bairro: string;
   cidade: string;
   lat?: number;
   lng?: number;
 
+  // Detalhes do Imóvel
   quartos: number;
   banheiros: number;
   suites?: number;
@@ -21,9 +27,11 @@ export interface Imovel {
   area: number;
   descricao: string;
 
+  // Custos Extras
   condominio?: number;
   iptu?: number;
 
+  // Comodidades (Features)
   piscina?: boolean;
   churrasqueira?: boolean;
   elevador?: boolean;
@@ -31,5 +39,6 @@ export interface Imovel {
   portaria?: boolean;
   aceitaPet?: boolean;
 
+  // Mídia
   imagens: string[];
 }

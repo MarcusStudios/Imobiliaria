@@ -25,7 +25,7 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 // Email do administrador
-const ADMIN_EMAIL = "admin@admin.com"; 
+const ADMIN_EMAIL = "lidiany.lopes@exemplo.com"; 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
