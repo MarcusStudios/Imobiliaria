@@ -189,6 +189,10 @@ export const CadastroImovel = () => {
                     <input 
                       name="precoAluguel" 
                       type="number" 
+                      min="0"
+                      step="0.01"
+                      max="999999"
+                      autoComplete="off"
                       value={formData.precoAluguel || ''} 
                       onChange={handleChange} 
                       className="input-control" 

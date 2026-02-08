@@ -30,6 +30,7 @@ export const Detalhes = () => {
   const TELEFONE_CORRETORA = "+5599991243054";
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchImovel = async () => {
       if (!id) return;
       try {
@@ -85,8 +86,18 @@ export const Detalhes = () => {
     imovel.imagens && imovel.imagens.length > 0
       ? imovel.imagens
       : ["https://via.placeholder.com/800x400?text=Sem+Foto"];
+  const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiany! Vi o imóvel ${imovel.titulo.toUpperCase()} (Cód: ${id?.slice(0, 6)}) e gostaria de mais informações.`;
+  const formatarData = (timestamp: any) => {
+    if (!timestamp) return "";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(date);
+  };
 
-  const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiany! Vi o imóvel *${imovel.titulo}* (Cód: ${id?.slice(0, 4)}) e gostaria de mais informações.`;
+  const dataRelevante = imovel.atualizadoEm
+    ? imovel.atualizadoEm
+    : imovel.criadoEm;
+  const textoData = imovel.atualizadoEm ? "Atualizado em" : "Publicado em";
+  const codigoFormatado = id ? id.slice(0, 6).toUpperCase() : "";
 
   const renderComodidade = (ativo: boolean | undefined, label: string) => {
     if (!ativo) return null;
@@ -111,27 +122,239 @@ export const Detalhes = () => {
     );
   };
 
-  const formatarData = (timestamp: any) => {
-    if (!timestamp) return "";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(date);
-  };
+  // --- COMPONENTE INTERNO: CARD DE PREÇO (REUTILIZÁVEL) ---
+  const PriceCard = () => (
+    <div
+      className="agent-card"
+      style={{
+        border: "1px solid #e2e8f0",
+        borderRadius: "12px",
+        padding: "1.5rem",
+        background: "#fff",
+      }}
+    >
+      {/* Preço Principal */}
+      <div>
+        <p
+          style={{
+            fontSize: "0.9rem",
+            color: "#64748b",
+            fontWeight: 600,
+            textTransform: "uppercase",
+            marginBottom: "0.25rem",
+          }}
+        >
+          Valor de {imovel.tipo}
+        </p>
+        <h2
+          style={{
+            color: "var(--primary)",
+            fontSize: "2.5rem",
+            fontWeight: 800,
+            margin: 0,
+          }}
+        >
+          {Number(imovel.preco).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          })}
+        </h2>
+      </div>
 
-  const dataRelevante = imovel.atualizadoEm
-    ? imovel.atualizadoEm
-    : imovel.criadoEm;
-  const textoData = imovel.atualizadoEm ? "Atualizado em" : "Publicado em";
+      {/* Preço Secundário */}
+      {imovel.tipo === "Ambos" && (imovel.precoAluguel ?? 0) > 0 && (
+        <div
+          style={{
+            marginTop: "1rem",
+            paddingTop: "1rem",
+            borderTop: "1px dashed #e2e8f0",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "0.8rem",
+              color: "#64748b",
+              marginBottom: "2px",
+            }}
+          >
+            OU ALUGUEL POR:
+          </p>
+          <p style={{ fontSize: "1.5rem", fontWeight: 700, color: "#16a34a" }}>
+            {Number(imovel.precoAluguel).toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            })}
+            <span style={{ fontSize: "0.9rem", fontWeight: 400 }}>/mês</span>
+          </p>
+        </div>
+      )}
 
-  // Formata o ID para não ficar gigante (pega os 6 primeiros caracteres e deixa maiúsculo)
-  const codigoFormatado = id ? id.slice(0, 6).toUpperCase() : "";
+      {/* Custos Extras */}
+      {(Number(imovel.condominio) > 0 || Number(imovel.iptu) > 0) && (
+        <div
+          style={{
+            background: "#f8fafc",
+            padding: "1rem",
+            borderRadius: "8px",
+            margin: "1.5rem 0",
+            fontSize: "0.9rem",
+          }}
+        >
+          {Number(imovel.condominio) > 0 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "8px",
+              }}
+            >
+              <span
+                style={{
+                  color: "#64748b",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                }}
+              >
+                <Building size={14} /> Condomínio
+              </span>
+              <strong style={{ color: "#334155" }}>
+                {Number(imovel.condominio).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              </strong>
+            </div>
+          )}
+          {Number(imovel.iptu) > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span
+                style={{
+                  color: "#64748b",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                }}
+              >
+                <MapPin size={14} /> IPTU (anual)
+              </span>
+              <strong style={{ color: "#334155" }}>
+                {Number(imovel.iptu).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              </strong>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Botão de WhatsApp */}
+      <div style={{ display: "grid", gap: "1rem" }}>
+        <a
+          href={linkZap}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-whatsapp"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+            background: "#25D366",
+            color: "white",
+            padding: "1rem",
+            borderRadius: "8px",
+            fontSize: "1.1rem",
+            fontWeight: 700,
+            textDecoration: "none",
+            boxShadow: "0 4px 6px rgba(37, 211, 102, 0.2)",
+          }}
+        >
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+          </svg>
+          Chamar no WhatsApp
+        </a>
+      </div>
+
+      {/* Info Horário */}
+      <div
+        style={{
+          marginTop: "1.5rem",
+          textAlign: "center",
+          fontSize: "0.85rem",
+          color: "#64748b",
+        }}
+      >
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "5px",
+            background: "#f1f5f9",
+            padding: "4px 10px",
+            borderRadius: "12px",
+          }}
+        >
+          <Clock size={14} /> Resposta rápida
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div
       className="detalhes-page"
       style={{ background: "#fff", paddingBottom: "4rem" }}
     >
+      {/* CSS PARA CONTROLAR VISIBILIDADE DO CARD */}
+      <style>{`
+        .details-layout {
+          display: flex;
+          gap: 2rem;
+          margin-top: 2rem;
+          align-items: flex-start;
+        }
+        
+        /* Por padrão (PC), esconde o card que fica no meio do conteúdo */
+        .mobile-price-container {
+           display: none;
+        }
+        
+        /* Por padrão (PC), mostra a sidebar */
+        .desktop-sidebar {
+           display: block;
+        }
+
+        /* Regras para Celular */
+        @media (max-width: 768px) {
+          .details-layout {
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          
+          /* No celular, MOSTRA o card que está abaixo das fotos */
+          .mobile-price-container {
+             display: block;
+             margin-top: 1.5rem;
+             margin-bottom: 1rem;
+          }
+
+          /* No celular, ESCONDE a sidebar lateral (para não duplicar) */
+          .desktop-sidebar {
+             display: none;
+          }
+
+          .details-column-left {
+             width: 100%;
+          }
+        }
+      `}</style>
+
       {/* CABEÇALHO */}
       <div className="container" style={{ padding: "2rem 1.5rem 0" }}>
+        {/* ... (Cabeçalho igual ao anterior) ... */}
         <div
           style={{
             display: "flex",
@@ -150,7 +373,6 @@ export const Detalhes = () => {
           >
             <ArrowLeft size={20} /> Voltar
           </Link>
-
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <button
               onClick={handleShare}
@@ -183,9 +405,7 @@ export const Detalhes = () => {
           </div>
         </div>
 
-        {/* AREA DO TÍTULO */}
         <div style={{ marginBottom: "2rem" }}>
-          {/* Linha de Badges, CÓDIGO e Data */}
           <div
             style={{
               display: "flex",
@@ -195,7 +415,6 @@ export const Detalhes = () => {
               alignItems: "center",
             }}
           >
-            {/* Tipo (Venda/Aluguel) */}
             <span
               style={{
                 background: "var(--primary)",
@@ -209,8 +428,6 @@ export const Detalhes = () => {
             >
               {imovel.tipo}
             </span>
-
-            {/* Destaque (Se houver) */}
             {imovel.destaque && (
               <span
                 style={{
@@ -226,8 +443,6 @@ export const Detalhes = () => {
                 Destaque
               </span>
             )}
-
-            {/* === CÓDIGO DO IMÓVEL (NOVO) === */}
             <span
               style={{
                 display: "flex",
@@ -242,27 +457,50 @@ export const Detalhes = () => {
                 border: "1px solid #e2e8f0",
               }}
             >
-               Código: {codigoFormatado}
+              Código: {codigoFormatado}
             </span>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+                gap: "2px",
+                marginLeft: "auto",
+              }}
+            >
+              {/* Data Relevante / Atualizado em */}
+              {dataRelevante && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontSize: "0.85rem",
+                    color: "#94a3b8",
+                  }}
+                >
+                  <CalendarCheck size={14} /> {textoData}{" "}
+                  <b>{formatarData(dataRelevante)}</b>
+                </span>
+              )}
 
-            {/* Data (Alinhada à direita) */}
-            {dataRelevante && (
-              <span
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  fontSize: "0.85rem",
-                  color: "#94a3b8",
-                  marginLeft: "auto",
-                }}
-              >
-                <CalendarCheck size={14} />
-                {textoData} <b>{formatarData(dataRelevante)}</b>
-              </span>
-            )}
+              {/* Criado em (Agora posicionado abaixo) */}
+              {imovel.criadoEm && !imovel.atualizadoEm && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontSize: "0.85rem",
+                    color: "#94a3b8",
+                  }}
+                >
+                  <Clock size={14} /> Criado em{" "}
+                  <b>{formatarData(imovel.criadoEm)}</b>
+                </span>
+              )}
+            </div>
           </div>
-
           <h1
             style={{
               fontSize: "2rem",
@@ -273,7 +511,6 @@ export const Detalhes = () => {
           >
             {imovel.titulo}
           </h1>
-
           <div
             style={{
               display: "flex",
@@ -284,17 +521,24 @@ export const Detalhes = () => {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-              <MapPin size={18} />
-              {imovel.endereco} - {imovel.bairro}, {imovel.cidade}
+              <MapPin size={18} /> {imovel.endereco} - {imovel.bairro},{" "}
+              {imovel.cidade}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container details-content">
-        {/* === COLUNA DA ESQUERDA (Conteúdo) === */}
-        <div style={{ flex: 2 }}>
+      {/* LAYOUT PRINCIPAL */}
+      <div className="container details-layout">
+        {/* COLUNA DA ESQUERDA */}
+        <div className="details-column-left" style={{ flex: 2 }}>
           <ImageGallery images={imagens} />
+
+          {/* === AQUI ESTÁ A MÁGICA: Card de Preço SÓ PARA CELULAR === */}
+          <div className="mobile-price-container">
+            <PriceCard />
+          </div>
+          {/* ======================================================= */}
 
           {/* Grid de Características */}
           <div
@@ -384,8 +628,9 @@ export const Detalhes = () => {
           </div>
         </div>
 
-        {/* === COLUNA DA DIREITA (Sidebar Sticky) === */}
+        {/* COLUNA DA DIREITA (Sidebar - SÓ PARA DESKTOP) */}
         <aside
+          className="desktop-sidebar"
           style={{
             flex: 1,
             position: "sticky",
@@ -393,198 +638,7 @@ export const Detalhes = () => {
             height: "fit-content",
           }}
         >
-          <div
-            className="agent-card"
-            style={{
-              border: "1px solid #e2e8f0",
-              borderRadius: "12px",
-              padding: "1.5rem",
-              background: "#fff",
-            }}
-          >
-            {/* Preço Principal */}
-            <div>
-              <p
-                style={{
-                  fontSize: "0.9rem",
-                  color: "#64748b",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  marginBottom: "0.25rem",
-                }}
-              >
-                Valor de {imovel.tipo}
-              </p>
-              <h2
-                style={{
-                  color: "var(--primary)",
-                  fontSize: "2.5rem",
-                  fontWeight: 800,
-                  margin: 0,
-                }}
-              >
-                {Number(imovel.preco).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </h2>
-            </div>
-
-            {/* Preço Secundário */}
-            {imovel.tipo === "Ambos" && (imovel.precoAluguel ?? 0) > 0 && (
-              <div
-                style={{
-                  marginTop: "1rem",
-                  paddingTop: "1rem",
-                  borderTop: "1px dashed #e2e8f0",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "#64748b",
-                    marginBottom: "2px",
-                  }}
-                >
-                  OU ALUGUEL POR:
-                </p>
-                <p
-                  style={{
-                    fontSize: "1.5rem",
-                    fontWeight: 700,
-                    color: "#16a34a",
-                  }}
-                >
-                  {Number(imovel.precoAluguel).toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                  <span style={{ fontSize: "0.9rem", fontWeight: 400 }}>
-                    /mês
-                  </span>
-                </p>
-              </div>
-            )}
-
-            {/* Custos Extras */}
-            {(Number(imovel.condominio) > 0 || Number(imovel.iptu) > 0) && (
-              <div
-                style={{
-                  background: "#f8fafc",
-                  padding: "1rem",
-                  borderRadius: "8px",
-                  margin: "1.5rem 0",
-                  fontSize: "0.9rem",
-                }}
-              >
-                {Number(imovel.condominio) > 0 && (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: "#64748b",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                      }}
-                    >
-                      <Building size={14} /> Condomínio
-                    </span>
-                    <strong style={{ color: "#334155" }}>
-                      {Number(imovel.condominio).toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </strong>
-                  </div>
-                )}
-                {Number(imovel.iptu) > 0 && (
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <span
-                      style={{
-                        color: "#64748b",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                      }}
-                    >
-                      <MapPin size={14} /> IPTU (anual)
-                    </span>
-                    <strong style={{ color: "#334155" }}>
-                      {Number(imovel.iptu).toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </strong>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Botão de WhatsApp */}
-            <div style={{ display: "grid", gap: "1rem" }}>
-              <a
-                href={linkZap}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-whatsapp"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "10px",
-                  background: "#25D366",
-                  color: "white",
-                  padding: "1rem",
-                  borderRadius: "8px",
-                  fontSize: "1.1rem",
-                  fontWeight: 700,
-                  textDecoration: "none",
-                  boxShadow: "0 4px 6px rgba(37, 211, 102, 0.2)",
-                }}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="24"
-                  height="24"
-                  fill="currentColor"
-                >
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                </svg>
-                Chamar no WhatsApp
-              </a>
-            </div>
-
-            {/* Info Horário */}
-            <div
-              style={{
-                marginTop: "1.5rem",
-                textAlign: "center",
-                fontSize: "0.85rem",
-                color: "#64748b",
-              }}
-            >
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  background: "#f1f5f9",
-                  padding: "4px 10px",
-                  borderRadius: "12px",
-                }}
-              >
-                <Clock size={14} /> Resposta rápida
-              </div>
-            </div>
-          </div>
+          <PriceCard />
         </aside>
       </div>
     </div>

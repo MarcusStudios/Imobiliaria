@@ -197,6 +197,7 @@ function App() {
 
       <Suspense fallback={<Loading />}>
         <Routes>
+          
           <Route path="/" element={<Home />} />
           <Route path="/imovel/:id" element={<Detalhes />} />
           <Route path="/favoritos" element={<Favoritos />} />
@@ -370,7 +371,7 @@ function App() {
               style={{
                 marginTop: "0.7rem",
                 fontSize: "0.8rem",
-                color: "#ffffff",
+                
               }}
             >
               Desenvolvido por marcuseduardo846@gmail.com
