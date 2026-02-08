@@ -1,14 +1,18 @@
-// src/pages/Admin.tsx
+// src/pages/Admin.tsx - VERSÃO ATUALIZADA COM UPLOAD DE IMAGENS
 import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import { db } from '../../services/firebaseConfig';
-import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { Imovel } from '../types';
+import { uploadMultipleImages, optimizeCloudinaryUrl } from '../services/cloudinaryService';
 
 export const CadastroImovel = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<Omit<Imovel, 'id'>>({
     titulo: '', descricao: '', tipo: 'Venda',
@@ -33,6 +37,7 @@ export const CadastroImovel = () => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { id: idIgnorado, ...dadosSemId } = data;
             setFormData(dadosSemId);
+            setPreviewUrls(dadosSemId.imagens || []);
           } else {
             alert("Imóvel não encontrado!");
             navigate('/admin');
@@ -58,31 +63,83 @@ export const CadastroImovel = () => {
     setFormData(prev => ({ ...prev, [name]: checked }));
   };
 
- ;
+  const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const dadosFinais = { ...formData };
-      if (dadosFinais.tipo !== 'Ambos') dadosFinais.precoAluguel = 0;
+    const filesArray = Array.from(files);
+    setSelectedFiles(prev => [...prev, ...filesArray]);
 
-      if (id) {
-        await updateDoc(doc(db, "imoveis", id), dadosFinais);
-        alert("Imóvel atualizado com sucesso!");
-      } else {
-        await addDoc(collection(db, "imoveis"), dadosFinais);
-        alert("Imóvel cadastrado com sucesso!");
-      }
-      navigate('/');
-    } catch (error) { 
-      console.error("Erro ao salvar:", error);
-      const msg = error instanceof Error ? error.message : "Erro desconhecido";
-      alert("Erro ao salvar: " + msg);
-    } finally {
-      setLoading(false);
+    // Criar previews locais
+    filesArray.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrls(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    
+    // Se estiver editando, remover também do formData
+    if (id) {
+      setFormData(prev => ({
+        ...prev,
+        imagens: prev.imagens.filter((_, i) => i !== index)
+      }));
     }
   };
+
+  const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    let imagensUrls = [...formData.imagens];
+
+    // Fazer upload das novas imagens selecionadas
+    if (selectedFiles.length > 0) {
+      setUploadingImages(true);
+      const novasUrls = await uploadMultipleImages(selectedFiles);
+      imagensUrls = [...imagensUrls, ...novasUrls];
+      setUploadingImages(false);
+    }
+
+    const dadosFinais = { 
+      ...formData,
+      imagens: imagensUrls,
+    };
+    
+    if (dadosFinais.tipo !== 'Ambos') dadosFinais.precoAluguel = 0;
+
+    if (id) {
+      // EDITANDO - adiciona data de atualização
+      await updateDoc(doc(db, "imoveis", id), {
+        ...dadosFinais,
+        atualizadoEm: serverTimestamp(), // ← ADICIONA TIMESTAMP DE ATUALIZAÇÃO
+      });
+      alert("Imóvel atualizado com sucesso!");
+    } else {
+      // CRIANDO - adiciona data de criação
+      await addDoc(collection(db, "imoveis"), {
+        ...dadosFinais,
+        criadoEm: serverTimestamp(), // ← ADICIONA TIMESTAMP DE CRIAÇÃO
+      });
+      alert("Imóvel cadastrado com sucesso!");
+    }
+    navigate('/');
+  } catch (error) { 
+    console.error("Erro ao salvar:", error);
+    const msg = error instanceof Error ? error.message : "Erro desconhecido";
+    alert("Erro ao salvar: " + msg);
+  } finally {
+    setLoading(false);
+    setUploadingImages(false);
+  }
+};
 
   return (
     <div className="container" style={{ padding: '2rem 0', maxWidth: '900px' }}>
@@ -181,7 +238,6 @@ export const CadastroImovel = () => {
                      />
                    </div>
                 </div>
-                
              </div>
           </section>
 
@@ -216,6 +272,82 @@ export const CadastroImovel = () => {
             </div>
           </section>
 
+          {/* NOVA SEÇÃO: UPLOAD DE IMAGENS */}
+          <section>
+            <h3>📸 Fotos do Imóvel</h3>
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              <div>
+                <label className="label">Adicionar Fotos</label>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  multiple 
+                  onChange={handleImageSelect}
+                  className="input-control"
+                  style={{ padding: '0.5rem' }}
+                />
+                <small style={{ color: '#666', fontSize: '0.85rem' }}>
+                  Selecione até 10 fotos. Formatos: JPG, PNG, WEBP
+                </small>
+              </div>
+
+              {/* Preview das imagens */}
+              {previewUrls.length > 0 && (
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', 
+                  gap: '1rem',
+                  marginTop: '1rem'
+                }}>
+                  {previewUrls.map((url, index) => (
+                    <div 
+                      key={index} 
+                      style={{ 
+                        position: 'relative',
+                        aspectRatio: '4/3',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        border: '2px solid #ddd'
+                      }}
+                    >
+                      <img 
+                        src={url.includes('cloudinary') ? optimizeCloudinaryUrl(url, 300) : url}
+                        alt={`Preview ${index + 1}`}
+                        style={{ 
+                          width: '100%', 
+                          height: '100%', 
+                          objectFit: 'cover' 
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        style={{
+                          position: 'absolute',
+                          top: '5px',
+                          right: '5px',
+                          background: 'rgba(255, 0, 0, 0.8)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '28px',
+                          height: '28px',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
           <section>
             <label className="label">Descrição</label>
             <textarea 
@@ -229,8 +361,13 @@ export const CadastroImovel = () => {
             />
           </section>
 
-          <button type="submit" className="btn-details" style={{ background: 'var(--primary)', color: 'white', marginTop:'1rem' }} disabled={loading}>
-            {loading ? "Salvando..." : "✅ Salvar Imóvel"}
+          <button 
+            type="submit" 
+            className="btn-details" 
+            style={{ background: 'var(--primary)', color: 'white', marginTop:'1rem' }} 
+            disabled={loading || uploadingImages}
+          >
+            {uploadingImages ? "📤 Enviando imagens..." : loading ? "💾 Salvando..." : "✅ Salvar Imóvel"}
           </button>
         </form>
       </div>

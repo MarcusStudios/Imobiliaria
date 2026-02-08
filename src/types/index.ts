@@ -7,6 +7,9 @@ export interface Imovel {
   
   // Controle de Rascunho vs Publicado
   ativo?: boolean; 
+  
+  // Destaque (imóveis em evidência)
+  destaque?: boolean;
 
   // Valores
   preco: number;          // Preço de Venda (ou Aluguel se for só aluguel)
@@ -27,6 +30,8 @@ export interface Imovel {
   area: number;
   descricao: string;
 
+  
+
   // Custos Extras
   condominio?: number;
   iptu?: number;
@@ -41,4 +46,8 @@ export interface Imovel {
 
   // Mídia
   imagens: string[];
+  
+  // Metadados
+  criadoEm?: any; // Timestamp do Firebase (pode ser Date ou Timestamp)
+  atualizadoEm?: any; // Timestamp da última atualização
 }

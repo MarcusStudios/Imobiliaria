@@ -51,6 +51,8 @@ export const Home = () => {
     // Texto
     const matchTexto =
       imovel.titulo.toLowerCase().includes(filtros.busca.toLowerCase()) ||
+      imovel.cidade.toLowerCase().includes(filtros.busca.toLowerCase()) ||
+      imovel.id.toLowerCase().includes(filtros.busca.toLowerCase()) ||
       imovel.endereco.toLowerCase().includes(filtros.busca.toLowerCase()) ||
       (imovel.bairro &&
         imovel.bairro.toLowerCase().includes(filtros.busca.toLowerCase()));
@@ -224,7 +226,9 @@ export const Home = () => {
             {listaFinal.length > 0 ? (
               // Usa a listaFinal (ordenada)
               listaFinal.map((imovel) => (
-                <ImovelCard key={imovel.id} imovel={imovel} />
+                <ImovelCard key={imovel.id} imovel={imovel} 
+                  
+                  />
               ))
             ) : (
               // ESTADO VAZIO PROFISSIONAL

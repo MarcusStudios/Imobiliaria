@@ -281,3 +281,18 @@ form section h3 {
   70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
   100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
 }
+
+/* Adicione isso no seu CSS */
+@keyframes rainbow-move {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.texto-arco-iris {
+  background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rainbow-move 5s ease infinite;
+}

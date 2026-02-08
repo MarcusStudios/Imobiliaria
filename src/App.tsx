@@ -16,40 +16,40 @@ import "./css/App.css";
 
 import { Home } from "./pages/Home";
 
-import { WhatsAppButton } from './components/WhatsAppButton';
+import { WhatsAppButton } from "./components/WhatsAppButton";
 // Imports com Lazy Loading (Carregamento sob demanda)
 const Admin = lazy(() =>
-  import("./pages/Admin").then((module) => ({ default: module.Admin }))
+  import("./pages/Admin").then((module) => ({ default: module.Admin })),
 );
 const Detalhes = lazy(() =>
-  import("./pages/Detalhes").then((module) => ({ default: module.Detalhes }))
+  import("./pages/Detalhes").then((module) => ({ default: module.Detalhes })),
 );
 
 const Perfil = lazy(() =>
-  import("./pages/Perfil").then((module) => ({ default: module.Perfil }))
+  import("./pages/Perfil").then((module) => ({ default: module.Perfil })),
 );
 
 const Favoritos = lazy(() =>
-  import("./pages/Favoritos").then((module) => ({ default: module.Favoritos }))
+  import("./pages/Favoritos").then((module) => ({ default: module.Favoritos })),
 );
 
 const Login = lazy(() =>
-  import("./pages/Login").then((module) => ({ default: module.Login }))
+  import("./pages/Login").then((module) => ({ default: module.Login })),
 );
 const Cadastro = lazy(() =>
-  import("./pages/Cadastro").then((module) => ({ default: module.Cadastro }))
+  import("./pages/Cadastro").then((module) => ({ default: module.Cadastro })),
 );
 const RecuperarSenha = lazy(() =>
   import("./pages/RecuperarSenha").then((module) => ({
     default: module.RecuperarSenha,
-  }))
+  })),
 );
 
 // Import do Formulário de Cadastro/Edição
 const CadastroImovel = lazy(() =>
   import("./pages/CadastroImovel").then((module) => ({
     default: module.CadastroImovel,
-  }))
+  })),
 );
 
 // Hooks
@@ -272,8 +272,6 @@ function App() {
             <p style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>
               Seu parceiro confiável no mercado imobiliário. V2.1
             </p>
-
-            
           </div>
 
           <div>
@@ -359,16 +357,23 @@ function App() {
 
           <div>
             <h4 style={{ color: "white", marginBottom: "1rem" }}>Segurança</h4>
-            <p>CRECI-MA: F4632</p>
             <p>CRECI-MA: 922-J</p>
+            <p>CRECI-MA: F4632</p>
             <p style={{ marginTop: "0.5rem", fontSize: "0.8rem" }}>
               © 2026 Lidiany Lopes Corretora.
               <br />
               Todos os direitos reservados.
-              
             </p>
-            <p style={{ marginTop: "0.5rem", fontSize: "0.8rem" }}>
-              Desenvolvido por Marcus Eduardo.
+
+            <p
+              className="texto-arco-iris"
+              style={{
+                marginTop: "0.7rem",
+                fontSize: "0.8rem",
+                color: "#ffffff",
+              }}
+            >
+              Desenvolvido por marcuseduardo846@gmail.com.
             </p>
           </div>
         </div>
