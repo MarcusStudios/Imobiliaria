@@ -373,7 +373,7 @@ function App() {
                 color: "#ffffff",
               }}
             >
-              Desenvolvido por marcuseduardo846@gmail.com.
+              Desenvolvido por marcuseduardo846@gmail.com
             </p>
           </div>
         </div>

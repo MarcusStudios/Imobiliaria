@@ -11,8 +11,8 @@ import {
   Edit,
   Building,
   Share2,
-  Calendar,
   Clock,
+  CalendarCheck,
 } from "lucide-react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebaseConfig";
@@ -27,7 +27,6 @@ export const Detalhes = () => {
   const [copied, setCopied] = useState(false);
   const { isAdmin } = useAuth();
 
-  // SEU NÚMERO AQUI
   const TELEFONE_CORRETORA = "+5599991243054";
 
   useEffect(() => {
@@ -77,39 +76,17 @@ export const Detalhes = () => {
         className="container"
         style={{ padding: "4rem", textAlign: "center" }}
       >
-        <div style={{ fontSize: "1.2rem", color: "var(--text-muted)" }}>
-          Carregando imóvel...
-        </div>
+        Carregando...
       </div>
     );
-
-  if (!imovel)
-    return (
-      <div
-        className="container"
-        style={{ padding: "4rem", textAlign: "center" }}
-      >
-        <h2>Imóvel não encontrado</h2>
-        <Link
-          to="/"
-          style={{
-            color: "var(--primary)",
-            marginTop: "1rem",
-            display: "inline-block",
-          }}
-        >
-          Voltar para o início
-        </Link>
-      </div>
-    );
+  if (!imovel) return <div className="container">Imóvel não encontrado</div>;
 
   const imagens =
     imovel.imagens && imovel.imagens.length > 0
       ? imovel.imagens
       : ["https://via.placeholder.com/800x400?text=Sem+Foto"];
 
-  const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiany! Vi o imóvel *${imovel.titulo}* no site e gostaria de mais detalhes *${id?.slice(0, 8).toUpperCase()}*. Link: ${window.location.href}`;
-
+  const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiany! Vi o imóvel *${imovel.titulo}* (Cód: ${id?.slice(0, 4)}) e gostaria de mais informações.`;
 
   const renderComodidade = (ativo: boolean | undefined, label: string) => {
     if (!ativo) return null;
@@ -119,11 +96,13 @@ export const Detalhes = () => {
           display: "flex",
           alignItems: "center",
           gap: "8px",
-          background: "#f1f5f9",
-          padding: "8px 12px",
-          borderRadius: "6px",
+          background: "#f8fafc",
+          border: "1px solid #e2e8f0",
+          padding: "8px 16px",
+          borderRadius: "20px",
           fontSize: "0.9rem",
           color: "#334155",
+          fontWeight: 500,
         }}
       >
         <CheckCircle2 size={16} color="var(--success)" />
@@ -133,84 +112,68 @@ export const Detalhes = () => {
   };
 
   const formatarData = (timestamp: any) => {
-    if (!timestamp) return "Data não disponível";
+    if (!timestamp) return "";
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    }).format(date);
+    return new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(date);
   };
 
+  const dataRelevante = imovel.atualizadoEm
+    ? imovel.atualizadoEm
+    : imovel.criadoEm;
+  const textoData = imovel.atualizadoEm ? "Atualizado em" : "Publicado em";
+
+  // Formata o ID para não ficar gigante (pega os 6 primeiros caracteres e deixa maiúsculo)
+  const codigoFormatado = id ? id.slice(0, 6).toUpperCase() : "";
+
   return (
-    <div className="detalhes-page">
-      {/* Cabeçalho com breadcrumb e ações */}
+    <div
+      className="detalhes-page"
+      style={{ background: "#fff", paddingBottom: "4rem" }}
+    >
+      {/* CABEÇALHO */}
       <div className="container" style={{ padding: "2rem 1.5rem 0" }}>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
             marginBottom: "1.5rem",
-            flexWrap: "wrap",
-            gap: "1rem",
           }}
         >
           <Link
             to="/"
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
               gap: "0.5rem",
-              color: "var(--text-muted)",
-              fontWeight: 500,
-              transition: "color 0.2s",
+              color: "#64748b",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.color = "var(--primary)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "var(--text-muted)")
-            }
           >
-            <ArrowLeft size={20} /> Voltar aos imóveis
+            <ArrowLeft size={20} /> Voltar
           </Link>
 
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            {/* Botão Compartilhar */}
+          <div style={{ display: "flex", gap: "0.5rem" }}>
             <button
               onClick={handleShare}
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
+                gap: "5px",
                 padding: "0.5rem 1rem",
-                background: "white",
-                border: "1px solid #e2e8f0",
+                border: "1px solid #cbd5e1",
                 borderRadius: "8px",
+                background: "white",
                 cursor: "pointer",
-                fontSize: "0.9rem",
-                fontWeight: 500,
-                color: "#334155",
-                transition: "all 0.2s",
               }}
             >
-              <Share2 size={16} />
-              {copied ? "Link copiado!" : "Compartilhar"}
+              <Share2 size={16} /> {copied ? "Copiado!" : "Compartilhar"}
             </button>
-
-            {/* Botão Editar (Admin) */}
             {isAdmin && (
               <Link
                 to={`/editar/${imovel.id}`}
                 className="btn-details"
                 style={{
-                  background: "var(--secondary)",
                   width: "auto",
-                  padding: "0.5rem 1rem",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
+                  background: "var(--secondary)",
                   marginTop: 0,
                 }}
               >
@@ -220,68 +183,92 @@ export const Detalhes = () => {
           </div>
         </div>
 
-        {/* Badge + Título + Endereço */}
-        <div style={{ marginBottom: "1.5rem" }}>
+        {/* AREA DO TÍTULO */}
+        <div style={{ marginBottom: "2rem" }}>
+          {/* Linha de Badges, CÓDIGO e Data */}
           <div
             style={{
               display: "flex",
-              gap: "0.5rem",
-              alignItems: "center",
+              gap: "10px",
+              marginBottom: "12px",
               flexWrap: "wrap",
-              marginBottom: "0.75rem",
+              alignItems: "center",
             }}
           >
+            {/* Tipo (Venda/Aluguel) */}
             <span
               style={{
                 background: "var(--primary)",
                 color: "white",
-                padding: "0.25rem 0.75rem",
-                borderRadius: "99px",
-                fontSize: "0.875rem",
-                fontWeight: 600,
+                padding: "4px 12px",
+                borderRadius: "4px",
+                fontSize: "0.8rem",
+                fontWeight: "bold",
+                textTransform: "uppercase",
               }}
             >
-              {imovel.tipo === "Ambos" ? "Venda ou Aluguel" : imovel.tipo}
+              {imovel.tipo}
             </span>
 
-            {/* Badge de Destaque (se tiver) */}
+            {/* Destaque (Se houver) */}
             {imovel.destaque && (
               <span
                 style={{
                   background: "#fbbf24",
-                  color: "#78350f",
-                  padding: "0.25rem 0.75rem",
-                  borderRadius: "99px",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
+                  color: "#92400e",
+                  padding: "4px 12px",
+                  borderRadius: "4px",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
                 }}
               >
-                ⭐ Destaque
+                Destaque
               </span>
             )}
 
-            {/* Código do imóvel */}
+            {/* === CÓDIGO DO IMÓVEL (NOVO) === */}
             <span
               style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
                 background: "#f1f5f9",
-                color: "#64748b",
-                padding: "0.25rem 0.75rem",
-                borderRadius: "99px",
-                fontSize: "0.875rem",
-                fontWeight: 500,
+                color: "#475569",
+                padding: "4px 12px",
+                borderRadius: "4px",
+                fontSize: "0.8rem",
+                fontWeight: "600",
+                border: "1px solid #e2e8f0",
               }}
             >
-              Cód: {id?.slice(0, 8).toUpperCase()}
-
+               Código: {codigoFormatado}
             </span>
+
+            {/* Data (Alinhada à direita) */}
+            {dataRelevante && (
+              <span
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  fontSize: "0.85rem",
+                  color: "#94a3b8",
+                  marginLeft: "auto",
+                }}
+              >
+                <CalendarCheck size={14} />
+                {textoData} <b>{formatarData(dataRelevante)}</b>
+              </span>
+            )}
           </div>
 
           <h1
             style={{
               fontSize: "2rem",
-              lineHeight: 1.2,
-              marginBottom: "0.75rem",
               color: "#1e293b",
+              marginBottom: "0.5rem",
+              lineHeight: 1.2,
             }}
           >
             {imovel.titulo}
@@ -291,152 +278,100 @@ export const Detalhes = () => {
             style={{
               display: "flex",
               alignItems: "center",
-              color: "var(--text-muted)",
-              gap: "5px",
-              fontSize: "1rem",
-            }}
-          >
-            <MapPin size={18} />
-            {imovel.endereco}
-            {imovel.bairro && ` - ${imovel.bairro}`}
-            {imovel.cidade && ` - ${imovel.cidade}`}
-          </div>
-
-          {/* Informações adicionais */}
-          <div
-            style={{
-              display: "flex",
-              gap: "1.5rem",
-              marginTop: "1rem",
-              fontSize: "0.875rem",
-              color: "#64748b",
+              gap: "1rem",
               flexWrap: "wrap",
+              color: "#64748b",
             }}
           >
-            {imovel.criadoEm && (
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "6px" }}
-              >
-                <Calendar size={14} />
-                Publicado em {formatarData(imovel.criadoEm)}
-              </div>
-            )}
-            {imovel.atualizadoEm && (
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "6px" }}
-              >
-                <Calendar size={14} />
-                Atualizado em {formatarData(imovel.atualizadoEm)}
-              </div>
-            )}
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <MapPin size={18} />
+              {imovel.endereco} - {imovel.bairro}, {imovel.cidade}
+            </div>
           </div>
         </div>
       </div>
 
       <div className="container details-content">
-        {/* COLUNA ESQUERDA: Fotos e Informações */}
-        <div>
+        {/* === COLUNA DA ESQUERDA (Conteúdo) === */}
+        <div style={{ flex: 2 }}>
           <ImageGallery images={imagens} />
 
-          {/* Características com ícones maiores */}
-          <div className="features-row">
-            <div style={{ textAlign: "center" }}>
-              <Maximize
-                size={28}
-                color="var(--primary)"
-                style={{ margin: "0 auto 8px" }}
-              />
-              <div style={{ fontWeight: 600, fontSize: "1.1rem" }}>
-                {imovel.area}
-              </div>
-              <small style={{ color: "#64748b" }}>m² de área</small>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <Bed
-                size={28}
-                color="var(--primary)"
-                style={{ margin: "0 auto 8px" }}
-              />
-              <div style={{ fontWeight: 600, fontSize: "1.1rem" }}>
-                {imovel.quartos}
-              </div>
-              <small style={{ color: "#64748b" }}>Quartos</small>
-            </div>
-            {imovel.suites && imovel.suites > 0 && (
-              <div style={{ textAlign: "center" }}>
-                <CheckCircle2
-                  size={28}
-                  color="var(--primary)"
-                  style={{ margin: "0 auto 8px" }}
+          {/* Grid de Características */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
+              gap: "1rem",
+              margin: "2rem 0",
+              padding: "1.5rem",
+              background: "#f8fafc",
+              borderRadius: "12px",
+              border: "1px solid #f1f5f9",
+            }}
+          >
+            {[
+              { icon: Maximize, label: "Área Útil", val: `${imovel.area} m²` },
+              { icon: Bed, label: "Quartos", val: imovel.quartos },
+              {
+                icon: CheckCircle2,
+                label: "Suítes",
+                val: imovel.suites || "-",
+              },
+              { icon: Bath, label: "Banheiros", val: imovel.banheiros },
+              { icon: Car, label: "Vagas", val: imovel.vagas || "-" },
+            ].map((item, idx) => (
+              <div key={idx} style={{ textAlign: "center" }}>
+                <item.icon
+                  size={24}
+                  style={{ color: "var(--primary)", marginBottom: "8px" }}
                 />
-                <div style={{ fontWeight: 600, fontSize: "1.1rem" }}>
-                  {imovel.suites}
+                <div
+                  style={{
+                    fontWeight: "700",
+                    color: "#334155",
+                    fontSize: "1.1rem",
+                  }}
+                >
+                  {item.val}
                 </div>
-                <small style={{ color: "#64748b" }}>Suítes</small>
-              </div>
-            )}
-            <div style={{ textAlign: "center" }}>
-              <Bath
-                size={28}
-                color="var(--primary)"
-                style={{ margin: "0 auto 8px" }}
-              />
-              <div style={{ fontWeight: 600, fontSize: "1.1rem" }}>
-                {imovel.banheiros}
-              </div>
-              <small style={{ color: "#64748b" }}>Banheiros</small>
-            </div>
-            {imovel.vagas && imovel.vagas > 0 && (
-              <div style={{ textAlign: "center" }}>
-                <Car
-                  size={28}
-                  color="var(--primary)"
-                  style={{ margin: "0 auto 8px" }}
-                />
-                <div style={{ fontWeight: 600, fontSize: "1.1rem" }}>
-                  {imovel.vagas}
+                <div style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
+                  {item.label}
                 </div>
-                <small style={{ color: "#64748b" }}>Vagas</small>
               </div>
-            )}
+            ))}
           </div>
 
-          {/* Descrição - movida para cima */}
-          <div
-            className="description"
-            style={{ marginTop: "2rem", marginBottom: "2rem" }}
-          >
+          <div className="description" style={{ marginBottom: "3rem" }}>
             <h3
               style={{
-                marginBottom: "1rem",
                 fontSize: "1.5rem",
                 color: "#1e293b",
+                marginBottom: "1rem",
               }}
             >
-              Sobre este imóvel
+              Sobre o imóvel
             </h3>
             <p
               style={{
                 lineHeight: 1.8,
                 color: "#475569",
-                fontSize: "1rem",
                 whiteSpace: "pre-line",
+                fontSize: "1.05rem",
               }}
             >
               {imovel.descricao}
             </p>
           </div>
 
-          {/* Comodidades */}
-          <div style={{ marginTop: "2rem" }}>
+          <div>
             <h3
               style={{
-                marginBottom: "1rem",
                 fontSize: "1.5rem",
                 color: "#1e293b",
+                marginBottom: "1rem",
               }}
             >
-              Comodidades e Diferenciais
+              Diferenciais
             </h3>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               {renderComodidade(imovel.piscina, "Piscina")}
@@ -445,66 +380,70 @@ export const Detalhes = () => {
               {renderComodidade(imovel.mobiliado, "Mobiliado")}
               {renderComodidade(imovel.portaria, "Portaria 24h")}
               {renderComodidade(imovel.aceitaPet, "Aceita Pet")}
-              {![
-                imovel.piscina,
-                imovel.churrasqueira,
-                imovel.elevador,
-                imovel.mobiliado,
-                imovel.portaria,
-                imovel.aceitaPet,
-              ].some(Boolean) && (
-                <p style={{ color: "#64748b", fontStyle: "italic" }}>
-                  Entre em contato para mais informações sobre as comodidades.
-                </p>
-              )}
             </div>
           </div>
         </div>
 
-        {/* COLUNA DIREITA: Card de Contato */}
-        <aside>
-          <div className="agent-card">
-            <h3
-              style={{
-                color: "#64748b",
-                fontSize: "0.85rem",
-                textTransform: "uppercase",
-                letterSpacing: "1.5px",
-                fontWeight: 600,
-              }}
-            >
-              {imovel.tipo === "Aluguel"
-                ? "Valor do Aluguel"
-                : "Valor do Imóvel"}
-            </h3>
-            <h2
-              style={{
-                color: "var(--primary)",
-                fontSize: "2.75rem",
-                fontWeight: 700,
-                margin: "0.5rem 0 0.5rem",
-                lineHeight: 1,
-              }}
-            >
-              {Number(imovel.preco).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </h2>
+        {/* === COLUNA DA DIREITA (Sidebar Sticky) === */}
+        <aside
+          style={{
+            flex: 1,
+            position: "sticky",
+            top: "2rem",
+            height: "fit-content",
+          }}
+        >
+          <div
+            className="agent-card"
+            style={{
+              border: "1px solid #e2e8f0",
+              borderRadius: "12px",
+              padding: "1.5rem",
+              background: "#fff",
+            }}
+          >
+            {/* Preço Principal */}
+            <div>
+              <p
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#64748b",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  marginBottom: "0.25rem",
+                }}
+              >
+                Valor de {imovel.tipo}
+              </p>
+              <h2
+                style={{
+                  color: "var(--primary)",
+                  fontSize: "2.5rem",
+                  fontWeight: 800,
+                  margin: 0,
+                }}
+              >
+                {Number(imovel.preco).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              </h2>
+            </div>
 
-            {imovel.tipo === "Ambos" && imovel.precoAluguel > 0 && (
+            {/* Preço Secundário */}
+            {imovel.tipo === "Ambos" && (imovel.precoAluguel ?? 0) > 0 && (
               <div
                 style={{
-                  marginTop: "0.5rem",
-                  paddingTop: "0.5rem",
-                  borderTop: "1px solid #e2e8f0",
+                  marginTop: "1rem",
+                  paddingTop: "1rem",
+                  borderTop: "1px dashed #e2e8f0",
                 }}
               >
                 <p
                   style={{
-                    fontSize: "0.85rem",
+                    fontSize: "0.8rem",
                     color: "#64748b",
-                    marginBottom: "4px",
+                    marginBottom: "2px",
                   }}
                 >
                   OU ALUGUEL POR:
@@ -513,15 +452,16 @@ export const Detalhes = () => {
                   style={{
                     fontSize: "1.5rem",
                     fontWeight: 700,
-                    color: "var(--primary)",
-                    margin: 0,
+                    color: "#16a34a",
                   }}
                 >
                   {Number(imovel.precoAluguel).toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
-                  /mês
+                  <span style={{ fontSize: "0.9rem", fontWeight: 400 }}>
+                    /mês
+                  </span>
                 </p>
               </div>
             )}
@@ -533,42 +473,29 @@ export const Detalhes = () => {
                   background: "#f8fafc",
                   padding: "1rem",
                   borderRadius: "8px",
-                  marginTop: "1.5rem",
-                  marginBottom: "1.5rem",
+                  margin: "1.5rem 0",
+                  fontSize: "0.9rem",
                 }}
               >
-                <p
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "#64748b",
-                    marginBottom: "0.75rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    fontWeight: 600,
-                  }}
-                >
-                  Custos Mensais
-                </p>
                 {Number(imovel.condominio) > 0 && (
                   <div
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
                       marginBottom: "8px",
-                      fontSize: "0.9rem",
                     }}
                   >
                     <span
                       style={{
-                        display: "flex",
-                        gap: "6px",
-                        alignItems: "center",
                         color: "#64748b",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px",
                       }}
                     >
-                      <Building size={14} /> Condomínio:
+                      <Building size={14} /> Condomínio
                     </span>
-                    <strong style={{ color: "#1e293b" }}>
+                    <strong style={{ color: "#334155" }}>
                       {Number(imovel.condominio).toLocaleString("pt-BR", {
                         style: "currency",
                         currency: "BRL",
@@ -578,23 +505,19 @@ export const Detalhes = () => {
                 )}
                 {Number(imovel.iptu) > 0 && (
                   <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: "0.9rem",
-                    }}
+                    style={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <span
                       style={{
-                        display: "flex",
-                        gap: "6px",
-                        alignItems: "center",
                         color: "#64748b",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px",
                       }}
                     >
-                      <MapPin size={14} /> IPTU/ano:
+                      <MapPin size={14} /> IPTU (anual)
                     </span>
-                    <strong style={{ color: "#1e293b" }}>
+                    <strong style={{ color: "#334155" }}>
                       {Number(imovel.iptu).toLocaleString("pt-BR", {
                         style: "currency",
                         currency: "BRL",
@@ -605,8 +528,8 @@ export const Detalhes = () => {
               </div>
             )}
 
-            {/* Botões de Contato */}
-            <div style={{ display: "grid", gap: "0.75rem" }}>
+            {/* Botão de WhatsApp */}
+            <div style={{ display: "grid", gap: "1rem" }}>
               <a
                 href={linkZap}
                 target="_blank"
@@ -621,76 +544,46 @@ export const Detalhes = () => {
                   color: "white",
                   padding: "1rem",
                   borderRadius: "8px",
-                  fontSize: "1.05rem",
-                  fontWeight: 600,
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
                   textDecoration: "none",
-                  transition: "all 0.2s",
+                  boxShadow: "0 4px 6px rgba(37, 211, 102, 0.2)",
                 }}
               >
                 <svg
                   viewBox="0 0 24 24"
-                  width="22"
-                  height="22"
+                  width="24"
+                  height="24"
                   fill="currentColor"
                 >
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                 </svg>
                 Chamar no WhatsApp
               </a>
-
-              
-
-             
             </div>
 
-            {/* Informação de atendimento */}
+            {/* Info Horário */}
             <div
               style={{
                 marginTop: "1.5rem",
-                padding: "1rem",
-                background: "#f0fdf4",
-                borderRadius: "8px",
-                border: "1px solid #86efac",
+                textAlign: "center",
+                fontSize: "0.85rem",
+                color: "#64748b",
               }}
             >
               <div
                 style={{
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
-                  gap: "8px",
-                  marginBottom: "6px",
+                  gap: "5px",
+                  background: "#f1f5f9",
+                  padding: "4px 10px",
+                  borderRadius: "12px",
                 }}
               >
-                <Clock size={16} color="#16a34a" />
-                <strong style={{ fontSize: "0.9rem", color: "#166534" }}>
-                  Horário de Atendimento
-                </strong>
+                <Clock size={14} /> Resposta rápida
               </div>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "0.85rem",
-                  color: "#15803d",
-                  lineHeight: 1.5,
-                }}
-              >
-                Segunda a Sexta: 8h - 18h
-                <br />
-                Sábado: 8h - 13h
-              </p>
             </div>
-
-            <p
-              style={{
-                textAlign: "center",
-                marginTop: "1rem",
-                marginBottom: "1rem",
-                fontSize: "0.85rem",
-                color: "#94a3b8",
-              }}
-            >
-              Resposta rápida garantida • Atendimento personalizado
-            </p>
           </div>
         </aside>
       </div>

@@ -296,3 +296,24 @@ form section h3 {
   color: transparent;
   animation: rainbow-move 5s ease infinite;
 }
+
+/* Adicione no seu CSS global */
+.details-content {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+  align-items: flex-start; /* Importante para o sticky funcionar */
+}
+
+/* Responsividade para celular */
+@media (max-width: 768px) {
+  .details-content {
+    flex-direction: column;
+  }
+  
+  /* No celular, a sidebar não deve ser sticky para não atrapalhar */
+  aside {
+    position: static !important;
+    width: 100%;
+  }
+}
