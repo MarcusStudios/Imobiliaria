@@ -87,6 +87,7 @@ export const Detalhes = () => {
       ? imovel.imagens
       : ["https://via.placeholder.com/800x400?text=Sem+Foto"];
   const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiany! Vi o imóvel ${imovel.titulo.toUpperCase()} (Cód: ${id?.slice(0, 6)}) e gostaria de mais informações.`;
+
   const formatarData = (timestamp: any) => {
     if (!timestamp) return "";
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
