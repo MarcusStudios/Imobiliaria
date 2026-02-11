@@ -1,14 +1,12 @@
 // src/contexts/FavoritosContext.tsx
-
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { db } from '../../services/firebaseConfig';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 
-// Importando o tipo do arquivo separado (para evitar erro de Fast Refresh)
-import type{ Imovel } from '../types';
+// Importando o tipo do arquivo separado
+import { type Imovel } from '../types';
 
-// Interface interna (SEM "export" antes)
 interface FavoritosContextData {
   favoritos: Imovel[];
   toggleFavorito: (imovel: Imovel) => Promise<void>;
@@ -16,10 +14,8 @@ interface FavoritosContextData {
   count: number;
 }
 
-// Criação do Contexto (SEM "export" antes)
 const FavoritosContext = createContext<FavoritosContextData>({} as FavoritosContextData);
 
-// O Provider (COM "export" antes)
 export const FavoritosProvider = ({ children }: { children: ReactNode }) => {
   const [favoritos, setFavoritos] = useState<Imovel[]>([]);
   const { user } = useAuth();
@@ -92,8 +88,7 @@ export const FavoritosProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </FavoritosContext.Provider>
   );
-}; // <--- ESSA CHAVE E PONTO-E-VÍRGULA SÃO ESSENCIAIS! 
-   // Se faltar isso aqui, a linha de baixo dá erro.
+};
 
-// O Hook (COM "export" antes)
+// eslint-disable-next-line react-refresh/only-export-components
 export const useFavoritos = () => useContext(FavoritosContext);

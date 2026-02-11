@@ -48,6 +48,9 @@ export interface Imovel {
   imagens: string[];
   
   // Metadados
+  visualizacoes?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   criadoEm?: any; // Timestamp do Firebase (pode ser Date ou Timestamp)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   atualizadoEm?: any; // Timestamp da última atualização
 }

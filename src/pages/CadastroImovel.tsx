@@ -13,6 +13,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import '../css/CadastroImovel.css';
 
 export const CadastroImovel = () => {
   const navigate = useNavigate();
@@ -201,57 +202,31 @@ export const CadastroImovel = () => {
   };
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '4rem' }}>
-      <div className="container" style={{ padding: '2rem 1rem', maxWidth: '1000px', margin: '0 auto' }}>
+    <div className="cadastro-container">
+      <div className="cadastro-content">
         
         {/* Header */}
-        <div style={{ 
-          background: 'white',
-          padding: '1.5rem',
-          borderRadius: '12px',
-          marginBottom: '1.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-        }}>
-          <Link 
-            to="/admin"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              color: '#64748b',
-              textDecoration: 'none',
-              fontSize: '0.9rem',
-              marginBottom: '1rem',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
-          >
+        <div className="cadastro-header">
+          <Link to="/admin" className="back-link">
             <ArrowLeft size={18} /> Voltar ao painel
           </Link>
           
-          <h1 style={{ margin: 0, fontSize: '2rem', color: '#1e293b' }}>
+          <h1 className="page-title">
             {id ? "✏️ Editar Imóvel" : "🏠 Cadastrar Novo Imóvel"}
           </h1>
-          <p style={{ margin: '0.5rem 0 0', color: '#64748b', fontSize: '0.95rem' }}>
+          <p className="page-subtitle">
             {id ? "Atualize as informações do imóvel" : "Preencha os dados do novo imóvel"}
           </p>
         </div>
 
         {/* Alertas de Erro */}
         {errors.length > 0 && (
-          <div style={{
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            borderRadius: '12px',
-            padding: '1rem',
-            marginBottom: '1.5rem'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+          <div className="error-alert">
+            <div className="error-header">
               <AlertCircle size={20} color="#ef4444" />
-              <strong style={{ color: '#991b1b' }}>Corrija os seguintes erros:</strong>
+              <strong className="error-title">Corrija os seguintes erros:</strong>
             </div>
-            <ul style={{ margin: '0.5rem 0 0 1.5rem', color: '#7f1d1d' }}>
+            <ul className="error-list">
               {errors.map((error, idx) => (
                 <li key={idx}>{error}</li>
               ))}
@@ -262,50 +237,36 @@ export const CadastroImovel = () => {
         <form onSubmit={handleSubmit}>
           
           {/* Seção: Informações Principais */}
-          <div style={{ 
-            background: 'white', 
-            padding: '2rem', 
-            borderRadius: '12px', 
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 1.5rem', 
-              fontSize: '1.25rem',
-              color: '#1e293b',
-              paddingBottom: '0.75rem',
-              borderBottom: '2px solid #f1f5f9'
-            }}>
+          <div className="form-section">
+            <h3 className="section-title">
               📋 Informações Principais
             </h3>
             
-            <div style={{ display: 'grid', gap: '1.5rem' }}>
+            <div className="grid-gap-1-5">
               <div>
-                <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                <label className="form-label">
                   Título do Anúncio *
                 </label>
                 <input 
                   name="titulo" 
                   value={formData.titulo} 
                   onChange={handleChange} 
-                  className="input-control" 
+                  className="form-input" 
                   required 
                   placeholder="Ex: Apartamento Moderno no Centro com Vista" 
-                  style={{ fontSize: '1rem' }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              <div className="grid-cols-adaptive">
                 <div>
-                  <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                  <label className="form-label">
                     Finalidade *
                   </label>
                   <select 
                     name="tipo" 
                     value={formData.tipo} 
                     onChange={handleChange} 
-                    className="input-control"
-                    style={{ fontSize: '1rem' }}
+                    className="form-select"
                   >
                     <option value="Venda">Venda</option>
                     <option value="Aluguel">Aluguel</option>
@@ -314,7 +275,7 @@ export const CadastroImovel = () => {
                 </div>
 
                 <div>
-                  <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                  <label className="form-label">
                     {formData.tipo === 'Aluguel' ? 'Valor do Aluguel (R$) *' : 'Valor de Venda (R$) *'}
                   </label>
                   <input 
@@ -322,16 +283,15 @@ export const CadastroImovel = () => {
                     type="number" 
                     value={formData.preco || ''} 
                     onChange={handleChange} 
-                    className="input-control" 
+                    className="form-input" 
                     required 
                     placeholder="350000"
-                    style={{ fontSize: '1rem' }}
                   />
                 </div>
 
                 {formData.tipo === 'Ambos' && (
                   <div>
-                    <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                    <label className="form-label">
                       Valor do Aluguel (R$) *
                     </label>
                     <input 
@@ -339,10 +299,9 @@ export const CadastroImovel = () => {
                       type="number" 
                       value={formData.precoAluguel || ''} 
                       onChange={handleChange} 
-                      className="input-control" 
+                      className="form-input" 
                       required 
                       placeholder="2500"
-                      style={{ fontSize: '1rem' }}
                     />
                   </div>
                 )}
@@ -351,65 +310,50 @@ export const CadastroImovel = () => {
           </div>
 
           {/* Seção: Localização */}
-          <div style={{ 
-            background: 'white', 
-            padding: '2rem', 
-            borderRadius: '12px', 
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 1.5rem', 
-              fontSize: '1.25rem',
-              color: '#1e293b',
-              paddingBottom: '0.75rem',
-              borderBottom: '2px solid #f1f5f9'
-            }}>
+          <div className="form-section">
+            <h3 className="section-title">
               📍 Localização
             </h3>
             
-            <div style={{ display: 'grid', gap: '1.5rem' }}>
+            <div className="grid-gap-1-5">
               <div>
-                <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                <label className="form-label">
                   Endereço Completo *
                 </label>
                 <input 
                   name="endereco" 
                   value={formData.endereco} 
                   onChange={handleChange} 
-                  className="input-control" 
+                  className="form-input" 
                   required 
                   placeholder="Ex: Rua das Palmeiras, 123"
-                  style={{ fontSize: '1rem' }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid-cols-2">
                 <div>
-                  <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                  <label className="form-label">
                     Bairro *
                   </label>
                   <input 
                     name="bairro" 
                     value={formData.bairro} 
                     onChange={handleChange} 
-                    className="input-control" 
+                    className="form-input" 
                     required 
                     placeholder="Ex: Jardim Imperial"
-                    style={{ fontSize: '1rem' }}
                   />
                 </div>
                 <div>
-                  <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                  <label className="form-label">
                     Cidade
                   </label>
                   <input 
                     name="cidade" 
                     value={formData.cidade} 
                     onChange={handleChange} 
-                    className="input-control" 
+                    className="form-input" 
                     placeholder="Açailândia"
-                    style={{ fontSize: '1rem' }}
                   />
                 </div>
               </div>
@@ -417,26 +361,14 @@ export const CadastroImovel = () => {
           </div>
 
           {/* Seção: Características */}
-          <div style={{ 
-            background: 'white', 
-            padding: '2rem', 
-            borderRadius: '12px', 
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 1.5rem', 
-              fontSize: '1.25rem',
-              color: '#1e293b',
-              paddingBottom: '0.75rem',
-              borderBottom: '2px solid #f1f5f9'
-            }}>
+          <div className="form-section">
+            <h3 className="section-title">
               🏡 Características do Imóvel
             </h3>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem' }}>
+            <div className="grid-cols-small">
               <div>
-                <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                <label className="form-label">
                   Área (m²)
                 </label>
                 <input 
@@ -444,13 +376,12 @@ export const CadastroImovel = () => {
                   type="number" 
                   value={formData.area || ''} 
                   onChange={handleChange} 
-                  className="input-control" 
+                  className="form-input" 
                   placeholder="120"
-                  style={{ fontSize: '1rem' }}
                 />
               </div>
               <div>
-                <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                <label className="form-label">
                   Quartos
                 </label>
                 <input 
@@ -458,13 +389,12 @@ export const CadastroImovel = () => {
                   type="number" 
                   value={formData.quartos || ''} 
                   onChange={handleChange} 
-                  className="input-control" 
+                  className="form-input" 
                   placeholder="3"
-                  style={{ fontSize: '1rem' }}
                 />
               </div>
               <div>
-                <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                <label className="form-label">
                   Suítes
                 </label>
                 <input 
@@ -472,13 +402,12 @@ export const CadastroImovel = () => {
                   type="number" 
                   value={formData.suites || ''} 
                   onChange={handleChange} 
-                  className="input-control" 
+                  className="form-input" 
                   placeholder="1"
-                  style={{ fontSize: '1rem' }}
                 />
               </div>
               <div>
-                <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                <label className="form-label">
                   Banheiros
                 </label>
                 <input 
@@ -486,13 +415,12 @@ export const CadastroImovel = () => {
                   type="number" 
                   value={formData.banheiros || ''} 
                   onChange={handleChange} 
-                  className="input-control" 
+                  className="form-input" 
                   placeholder="2"
-                  style={{ fontSize: '1rem' }}
                 />
               </div>
               <div>
-                <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                <label className="form-label">
                   Vagas
                 </label>
                 <input 
@@ -500,35 +428,22 @@ export const CadastroImovel = () => {
                   type="number" 
                   value={formData.vagas || ''} 
                   onChange={handleChange} 
-                  className="input-control" 
+                  className="form-input" 
                   placeholder="2"
-                  style={{ fontSize: '1rem' }}
                 />
               </div>
             </div>
           </div>
 
           {/* Seção: Custos Extras */}
-          <div style={{ 
-            background: 'white', 
-            padding: '2rem', 
-            borderRadius: '12px', 
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 1.5rem', 
-              fontSize: '1.25rem',
-              color: '#1e293b',
-              paddingBottom: '0.75rem',
-              borderBottom: '2px solid #f1f5f9'
-            }}>
+          <div className="form-section">
+            <h3 className="section-title">
               💰 Custos Adicionais
             </h3>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="grid-cols-2">
               <div>
-                <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                <label className="form-label">
                   Condomínio (R$/mês)
                 </label>
                 <input 
@@ -536,13 +451,12 @@ export const CadastroImovel = () => {
                   type="number" 
                   value={formData.condominio || ''} 
                   onChange={handleChange} 
-                  className="input-control" 
+                  className="form-input" 
                   placeholder="450"
-                  style={{ fontSize: '1rem' }}
                 />
               </div>
               <div>
-                <label className="label" style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                <label className="form-label">
                   IPTU (R$/ano)
                 </label>
                 <input 
@@ -550,33 +464,20 @@ export const CadastroImovel = () => {
                   type="number" 
                   value={formData.iptu || ''} 
                   onChange={handleChange} 
-                  className="input-control" 
+                  className="form-input" 
                   placeholder="1200"
-                  style={{ fontSize: '1rem' }}
                 />
               </div>
             </div>
           </div>
 
           {/* Seção: Comodidades */}
-          <div style={{ 
-            background: 'white', 
-            padding: '2rem', 
-            borderRadius: '12px', 
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 1.5rem', 
-              fontSize: '1.25rem',
-              color: '#1e293b',
-              paddingBottom: '0.75rem',
-              borderBottom: '2px solid #f1f5f9'
-            }}>
+          <div className="form-section">
+            <h3 className="section-title">
               ✨ Comodidades
             </h3>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem' }}>
+            <div className="comodidades-grid">
               {[
                 { name: 'piscina', label: '🏊 Piscina' },
                 { name: 'churrasqueira', label: '🔥 Churrasqueira' },
@@ -587,26 +488,16 @@ export const CadastroImovel = () => {
               ].map(comodidade => (
                 <label 
                   key={comodidade.name}
-                  style={{
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '10px', 
-                    cursor: 'pointer',
-                    padding: '0.75rem',
-                    background: formData[comodidade.name as keyof typeof formData] ? '#f0fdf4' : '#f8fafc',
-                    border: formData[comodidade.name as keyof typeof formData] ? '2px solid #22c55e' : '2px solid #e2e8f0',
-                    borderRadius: '8px',
-                    transition: 'all 0.2s'
-                  }}
+                  className={`comodidade-label ${formData[comodidade.name as keyof typeof formData] ? 'active' : ''}`}
                 >
                   <input 
                     type="checkbox" 
                     name={comodidade.name} 
                     checked={formData[comodidade.name as keyof typeof formData] as boolean} 
                     onChange={handleCheck} 
-                    style={{ width: '20px', height: '20px', cursor: 'pointer' }} 
+                    className="comodidade-checkbox"
                   />
-                  <span style={{ fontSize: '0.95rem', fontWeight: 500 }}>
+                  <span className="comodidade-text">
                     {comodidade.label}
                   </span>
                 </label>
@@ -615,81 +506,39 @@ export const CadastroImovel = () => {
           </div>
 
           {/* Seção: Upload de Imagens */}
-          <div style={{ 
-            background: 'white', 
-            padding: '2rem', 
-            borderRadius: '12px', 
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 1.5rem', 
-              fontSize: '1.25rem',
-              color: '#1e293b',
-              paddingBottom: '0.75rem',
-              borderBottom: '2px solid #f1f5f9'
-            }}>
+          <div className="form-section">
+            <h3 className="section-title">
               📸 Fotos do Imóvel *
             </h3>
             
-            <div style={{ display: 'grid', gap: '1.5rem' }}>
-              <div style={{
-                border: '2px dashed #cbd5e1',
-                borderRadius: '12px',
-                padding: '2rem',
-                textAlign: 'center',
-                background: '#f8fafc',
-                position: 'relative'
-              }}>
+            <div className="grid-gap-1-5">
+              <div className="upload-area">
                 <input 
                   type="file" 
                   accept="image/*" 
                   multiple 
                   onChange={handleImageSelect}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    opacity: 0,
-                    cursor: 'pointer'
-                  }}
+                  className="file-input"
                 />
-                <Upload size={48} color="#94a3b8" style={{ margin: '0 auto 1rem' }} />
-                <p style={{ margin: '0 0 0.5rem', fontSize: '1.1rem', fontWeight: 600, color: '#334155' }}>
+                <Upload size={48} className="upload-icon" />
+                <p className="upload-title">
                   Clique ou arraste fotos aqui
                 </p>
-                <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b' }}>
+                <p className="upload-hint">
                   Máximo 10 fotos • JPG, PNG ou WEBP • Máx 5MB cada
                 </p>
-                <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: '#64748b' }}>
+                <p className="upload-counter">
                   {previewUrls.length}/10 fotos adicionadas
                 </p>
               </div>
 
               {/* Barra de Progresso */}
               {uploadingImages && (
-                <div>
-                  <div style={{ 
-                    background: '#e2e8f0', 
-                    height: '8px', 
-                    borderRadius: '4px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{
-                      background: 'var(--primary)',
-                      height: '100%',
-                      width: `${uploadProgress}%`,
-                      transition: 'width 0.3s ease'
-                    }} />
+                <div className="progress-container">
+                  <div className="progress-bar-bg">
+                    <div className="progress-bar-fill" style={{ width: `${uploadProgress}%` }} />
                   </div>
-                  <p style={{ 
-                    margin: '0.5rem 0 0', 
-                    fontSize: '0.875rem', 
-                    color: '#64748b',
-                    textAlign: 'center'
-                  }}>
+                  <p className="progress-text">
                     Enviando fotos... {uploadProgress}%
                   </p>
                 </div>
@@ -697,68 +546,23 @@ export const CadastroImovel = () => {
 
               {/* Preview das Imagens */}
               {previewUrls.length > 0 && (
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', 
-                  gap: '1rem'
-                }}>
+                <div className="previews-grid">
                   {previewUrls.map((url, index) => (
-                    <div 
-                      key={index} 
-                      style={{ 
-                        position: 'relative',
-                        aspectRatio: '4/3',
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        border: '2px solid #e2e8f0',
-                        background: '#f8fafc'
-                      }}
-                    >
+                    <div key={index} className="preview-card">
                       {index === 0 && (
-                        <div style={{
-                          position: 'absolute',
-                          top: '8px',
-                          left: '8px',
-                          background: 'var(--primary)',
-                          color: 'white',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          zIndex: 2
-                        }}>
+                        <div className="cover-badge">
                           CAPA
                         </div>
                       )}
                       <img 
                         src={url.includes('cloudinary') ? optimizeCloudinaryUrl(url, 300) : url}
                         alt={`Preview ${index + 1}`}
-                        style={{ 
-                          width: '100%', 
-                          height: '100%', 
-                          objectFit: 'cover' 
-                        }}
+                        className="preview-image"
                       />
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        style={{
-                          position: 'absolute',
-                          top: '8px',
-                          right: '8px',
-                          background: 'rgba(239, 68, 68, 0.95)',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '32px',
-                          height: '32px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'all 0.2s',
-                          zIndex: 2
-                        }}
+                        className="remove-image-btn"
                       >
                         <X size={18} />
                       </button>
@@ -770,20 +574,8 @@ export const CadastroImovel = () => {
           </div>
 
           {/* Seção: Descrição */}
-          <div style={{ 
-            background: 'white', 
-            padding: '2rem', 
-            borderRadius: '12px', 
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 1.5rem', 
-              fontSize: '1.25rem',
-              color: '#1e293b',
-              paddingBottom: '0.75rem',
-              borderBottom: '2px solid #f1f5f9'
-            }}>
+          <div className="form-section">
+            <h3 className="section-title">
               📝 Descrição Detalhada
             </h3>
             
@@ -792,91 +584,52 @@ export const CadastroImovel = () => {
               rows={8} 
               value={formData.descricao} 
               onChange={handleChange} 
-              className="input-control" 
+              className="form-textarea" 
               placeholder="Descreva o imóvel em detalhes: acabamentos, localização, diferenciais, proximidade de comércios, escolas, etc."
-              style={{ 
-                fontSize: '1rem',
-                lineHeight: 1.6,
-                resize: 'vertical'
-              }}
             />
-            <p style={{ 
-              margin: '0.5rem 0 0', 
-              fontSize: '0.875rem', 
-              color: '#64748b'
-            }}>
+            <p className="char-counter">
               {formData.descricao.length} caracteres
             </p>
           </div>
 
           {/* Seção: Configurações de Publicação */}
-          <div style={{ 
-            background: 'white', 
-            padding: '2rem', 
-            borderRadius: '12px', 
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 1.5rem', 
-              fontSize: '1.25rem',
-              color: '#1e293b',
-              paddingBottom: '0.75rem',
-              borderBottom: '2px solid #f1f5f9'
-            }}>
+          <div className="form-section">
+            <h3 className="section-title">
               ⚙️ Configurações de Publicação
             </h3>
             
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              <label style={{
-                display: 'flex', 
-                alignItems: 'flex-start', 
-                gap: '12px', 
-                cursor: 'pointer',
-                padding: '1rem',
-                background: '#f8fafc',
-                borderRadius: '8px',
-                border: '2px solid #e2e8f0'
-              }}>
+            <div className="grid-gap-1-5">
+              <label className="config-label">
                 <input 
                   type="checkbox" 
                   name="ativo" 
                   checked={formData.ativo} 
                   onChange={handleCheck} 
-                  style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer' }} 
+                  className="config-checkbox"
                 />
                 <div>
-                  <strong style={{ fontSize: '1rem', color: '#1e293b', display: 'block', marginBottom: '4px' }}>
+                  <strong className="config-title">
                     Publicar Imediatamente
                   </strong>
-                  <small style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                  <small className="config-desc">
                     Desmarque para salvar como rascunho (não aparecerá no site)
                   </small>
                 </div>
               </label>
 
-              <label style={{
-                display: 'flex', 
-                alignItems: 'flex-start', 
-                gap: '12px', 
-                cursor: 'pointer',
-                padding: '1rem',
-                background: formData.destaque ? '#fef3c7' : '#f8fafc',
-                borderRadius: '8px',
-                border: formData.destaque ? '2px solid #fbbf24' : '2px solid #e2e8f0'
-              }}>
+              <label className={`config-label ${formData.destaque ? 'highlight' : ''}`}>
                 <input 
                   type="checkbox" 
                   name="destaque" 
                   checked={formData.destaque} 
                   onChange={handleCheck} 
-                  style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer' }} 
+                  className="config-checkbox"
                 />
                 <div>
-                  <strong style={{ fontSize: '1rem', color: '#1e293b', display: 'block', marginBottom: '4px' }}>
+                  <strong className="config-title">
                     ⭐ Marcar como Destaque
                   </strong>
-                  <small style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                  <small className="config-desc">
                     Imóvel aparecerá com badge especial e terá prioridade na listagem
                   </small>
                 </div>
@@ -885,29 +638,10 @@ export const CadastroImovel = () => {
           </div>
 
           {/* Botões de Ação */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '1rem', 
-            justifyContent: 'flex-end',
-            flexWrap: 'wrap'
-          }}>
+          <div className="form-actions">
             <Link
               to="/admin"
-              style={{
-                padding: '1rem 2rem',
-                borderRadius: '8px',
-                border: '2px solid #e2e8f0',
-                background: 'white',
-                color: '#64748b',
-                fontSize: '1rem',
-                fontWeight: 600,
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
+              className="btn-cancel"
             >
               Cancelar
             </Link>
@@ -915,21 +649,7 @@ export const CadastroImovel = () => {
             <button 
               type="submit" 
               disabled={loading || uploadingImages}
-              style={{
-                padding: '1rem 2rem',
-                borderRadius: '8px',
-                border: 'none',
-                background: loading || uploadingImages ? '#cbd5e1' : 'var(--primary)',
-                color: 'white',
-                fontSize: '1rem',
-                fontWeight: 600,
-                cursor: loading || uploadingImages ? 'not-allowed' : 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                transition: 'all 0.2s',
-                boxShadow: loading || uploadingImages ? 'none' : '0 4px 6px rgba(0,0,0,0.1)'
-              }}
+              className="btn-submit"
             >
               {uploadingImages ? (
                 <>📤 Enviando imagens...</>

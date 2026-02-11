@@ -9,16 +9,18 @@ import {
   ArrowLeft,
   CheckCircle2,
   Edit,
-  Building,
   Share2,
   Clock,
   CalendarCheck,
 } from "lucide-react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, type Timestamp } from "firebase/firestore";
 import { db } from "../../services/firebaseConfig";
 import { ImageGallery } from "../components/ImageGallery";
+import { PriceCard } from "../components/PriceCard";
 import type { Imovel } from "../types";
 import { useAuth } from "../contexts/AuthContext";
+import { useWhatsApp } from "../contexts/WhatsAppContext";
+import "../css/Detalhes.css";
 
 export const Detalhes = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,8 +28,7 @@ export const Detalhes = () => {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const { isAdmin } = useAuth();
-
-  const TELEFONE_CORRETORA = "+5599991243054";
+  const { setMessage, resetMessage } = useWhatsApp();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -50,11 +51,13 @@ export const Detalhes = () => {
   useEffect(() => {
     if (imovel) {
       document.title = `${imovel.titulo} | Lidiany Lopes Corretora`;
+      setMessage(`Olá! Estou interessado no imóvel "${imovel.titulo}" (Código: ${id ? id.slice(0, 6).toUpperCase() : ""}) e gostaria de mais informações.`);
     }
     return () => {
       document.title = "Lidiany Lopes Corretora de Imóveis";
+      resetMessage();
     };
-  }, [imovel]);
+  }, [imovel, id, setMessage, resetMessage]);
 
   const handleShare = () => {
     const url = window.location.href;
@@ -73,10 +76,7 @@ export const Detalhes = () => {
 
   if (loading)
     return (
-      <div
-        className="container"
-        style={{ padding: "4rem", textAlign: "center" }}
-      >
+      <div className="container" style={{ padding: "4rem", textAlign: "center" }}>
         Carregando...
       </div>
     );
@@ -86,10 +86,11 @@ export const Detalhes = () => {
     imovel.imagens && imovel.imagens.length > 0
       ? imovel.imagens
       : ["https://via.placeholder.com/800x400?text=Sem+Foto"];
-  const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiany! Vi o imóvel ${imovel.titulo.toUpperCase()} (Cód: ${id?.slice(0, 6)}) e gostaria de mais informações.`;
 
-  const formatarData = (timestamp: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formatarData = (timestamp: any | Timestamp) => {
     if (!timestamp) return "";
+    // Verifica se tem o método toDate (Timestamp do Firebase)
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(date);
   };
@@ -103,302 +104,31 @@ export const Detalhes = () => {
   const renderComodidade = (ativo: boolean | undefined, label: string) => {
     if (!ativo) return null;
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          background: "#f8fafc",
-          border: "1px solid #e2e8f0",
-          padding: "8px 16px",
-          borderRadius: "20px",
-          fontSize: "0.9rem",
-          color: "#334155",
-          fontWeight: 500,
-        }}
-      >
+      <div className="comodidade-badge">
         <CheckCircle2 size={16} color="var(--success)" />
         {label}
       </div>
     );
   };
 
-  // --- COMPONENTE INTERNO: CARD DE PREÇO (REUTILIZÁVEL) ---
-  const PriceCard = () => (
-    <div
-      className="agent-card"
-      style={{
-        border: "1px solid #e2e8f0",
-        borderRadius: "12px",
-        padding: "1.5rem",
-        background: "#fff",
-      }}
-    >
-      {/* Preço Principal */}
-      <div>
-        <p
-          style={{
-            fontSize: "0.9rem",
-            color: "#64748b",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            marginBottom: "0.25rem",
-          }}
-        >
-          Valor de {imovel.tipo}
-        </p>
-        <h2
-          style={{
-            color: "var(--primary)",
-            fontSize: "2.5rem",
-            fontWeight: 800,
-            margin: 0,
-          }}
-        >
-          {Number(imovel.preco).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          })}
-        </h2>
-      </div>
-
-      {/* Preço Secundário */}
-      {imovel.tipo === "Ambos" && (imovel.precoAluguel ?? 0) > 0 && (
-        <div
-          style={{
-            marginTop: "1rem",
-            paddingTop: "1rem",
-            borderTop: "1px dashed #e2e8f0",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "0.8rem",
-              color: "#64748b",
-              marginBottom: "2px",
-            }}
-          >
-            OU ALUGUEL POR:
-          </p>
-          <p style={{ fontSize: "1.5rem", fontWeight: 700, color: "#16a34a" }}>
-            {Number(imovel.precoAluguel).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-            <span style={{ fontSize: "0.9rem", fontWeight: 400 }}>/mês</span>
-          </p>
-        </div>
-      )}
-
-      {/* Custos Extras */}
-      {(Number(imovel.condominio) > 0 || Number(imovel.iptu) > 0) && (
-        <div
-          style={{
-            background: "#f8fafc",
-            padding: "1rem",
-            borderRadius: "8px",
-            margin: "1.5rem 0",
-            fontSize: "0.9rem",
-          }}
-        >
-          {Number(imovel.condominio) > 0 && (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "8px",
-              }}
-            >
-              <span
-                style={{
-                  color: "#64748b",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                }}
-              >
-                <Building size={14} /> Condomínio
-              </span>
-              <strong style={{ color: "#334155" }}>
-                {Number(imovel.condominio).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </strong>
-            </div>
-          )}
-          {Number(imovel.iptu) > 0 && (
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span
-                style={{
-                  color: "#64748b",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                }}
-              >
-                <MapPin size={14} /> IPTU (anual)
-              </span>
-              <strong style={{ color: "#334155" }}>
-                {Number(imovel.iptu).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </strong>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Botão de WhatsApp */}
-      <div style={{ display: "grid", gap: "1rem" }}>
-        <a
-          href={linkZap}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-whatsapp"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "10px",
-            background: "#25D366",
-            color: "white",
-            padding: "1rem",
-            borderRadius: "8px",
-            fontSize: "1.1rem",
-            fontWeight: 700,
-            textDecoration: "none",
-            boxShadow: "0 4px 6px rgba(37, 211, 102, 0.2)",
-          }}
-        >
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-          </svg>
-          Chamar no WhatsApp
-        </a>
-      </div>
-
-      {/* Info Horário */}
-      <div
-        style={{
-          marginTop: "1.5rem",
-          textAlign: "center",
-          fontSize: "0.85rem",
-          color: "#64748b",
-        }}
-      >
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "5px",
-            background: "#f1f5f9",
-            padding: "4px 10px",
-            borderRadius: "12px",
-          }}
-        >
-          <Clock size={14} /> Resposta rápida
-        </div>
-      </div>
-    </div>
-  );
-
   return (
-    <div
-      className="detalhes-page"
-      style={{ background: "#fff", paddingBottom: "4rem" }}
-    >
-      {/* CSS PARA CONTROLAR VISIBILIDADE DO CARD */}
-      <style>{`
-        .details-layout {
-          display: flex;
-          gap: 2rem;
-          margin-top: 2rem;
-          align-items: flex-start;
-        }
-        
-        /* Por padrão (PC), esconde o card que fica no meio do conteúdo */
-        .mobile-price-container {
-           display: none;
-        }
-        
-        /* Por padrão (PC), mostra a sidebar */
-        .desktop-sidebar {
-           display: block;
-        }
-
-        /* Regras para Celular */
-        @media (max-width: 768px) {
-          .details-layout {
-            flex-direction: column;
-            gap: 1.5rem;
-          }
-          
-          /* No celular, MOSTRA o card que está abaixo das fotos */
-          .mobile-price-container {
-             display: block;
-             margin-top: 1.5rem;
-             margin-bottom: 1rem;
-          }
-
-          /* No celular, ESCONDE a sidebar lateral (para não duplicar) */
-          .desktop-sidebar {
-             display: none;
-          }
-
-          .details-column-left {
-             width: 100%;
-          }
-        }
-      `}</style>
-
+    <div className="detalhes-page">
       {/* CABEÇALHO */}
-      <div className="container" style={{ padding: "2rem 1.5rem 0" }}>
-        {/* ... (Cabeçalho igual ao anterior) ... */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: "1.5rem",
-          }}
-        >
-          <Link
-            to="/"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              color: "#64748b",
-            }}
-          >
+      <div className="container detalhes-header-container">
+        
+        <div className="detalhes-nav-bar">
+          <Link to="/" className="detalhes-back-link">
             <ArrowLeft size={20} /> Voltar
           </Link>
-          <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button
-              onClick={handleShare}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-                padding: "0.5rem 1rem",
-                border: "1px solid #cbd5e1",
-                borderRadius: "8px",
-                background: "white",
-                cursor: "pointer",
-              }}
-            >
+          <div className="detalhes-actions">
+            <button onClick={handleShare} className="btn-share">
               <Share2 size={16} /> {copied ? "Copiado!" : "Compartilhar"}
             </button>
             {isAdmin && (
               <Link
                 to={`/editar/${imovel.id}`}
                 className="btn-details"
-                style={{
-                  width: "auto",
-                  background: "var(--secondary)",
-                  marginTop: 0,
-                }}
+                style={{ width: "auto", background: "var(--secondary)", marginTop: 0 }}
               >
                 <Edit size={16} /> Editar
               </Link>
@@ -407,121 +137,41 @@ export const Detalhes = () => {
         </div>
 
         <div style={{ marginBottom: "2rem" }}>
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-              marginBottom: "12px",
-              flexWrap: "wrap",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                background: "var(--primary)",
-                color: "white",
-                padding: "4px 12px",
-                borderRadius: "4px",
-                fontSize: "0.8rem",
-                fontWeight: "bold",
-                textTransform: "uppercase",
-              }}
-            >
+          <div className="detalhes-tags-container">
+            <span className="tag-tipo">
               {imovel.tipo}
             </span>
             {imovel.destaque && (
-              <span
-                style={{
-                  background: "#fbbf24",
-                  color: "#92400e",
-                  padding: "4px 12px",
-                  borderRadius: "4px",
-                  fontSize: "0.8rem",
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                }}
-              >
+              <span className="tag-destaque">
                 Destaque
               </span>
             )}
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                background: "#f1f5f9",
-                color: "#475569",
-                padding: "4px 12px",
-                borderRadius: "4px",
-                fontSize: "0.8rem",
-                fontWeight: "600",
-                border: "1px solid #e2e8f0",
-              }}
-            >
+            <span className="tag-codigo">
               Código: {codigoFormatado}
             </span>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end",
-                gap: "2px",
-                marginLeft: "auto",
-              }}
-            >
+            <div className="detalhes-dates">
               {/* Data Relevante / Atualizado em */}
               {dataRelevante && (
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    fontSize: "0.85rem",
-                    color: "#94a3b8",
-                  }}
-                >
+                <span className="date-info">
                   <CalendarCheck size={14} /> {textoData}{" "}
                   <b>{formatarData(dataRelevante)}</b>
                 </span>
               )}
 
-              {/* Criado em (Agora posicionado abaixo) */}
+              {/* Criado em */}
               {imovel.criadoEm && !imovel.atualizadoEm && (
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    fontSize: "0.85rem",
-                    color: "#94a3b8",
-                  }}
-                >
+                <span className="date-info">
                   <Clock size={14} /> Criado em{" "}
                   <b>{formatarData(imovel.criadoEm)}</b>
                 </span>
               )}
             </div>
           </div>
-          <h1
-            style={{
-              fontSize: "2rem",
-              color: "#1e293b",
-              marginBottom: "0.5rem",
-              lineHeight: 1.2,
-            }}
-          >
+          <h1 className="detalhes-title">
             {imovel.titulo}
           </h1>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "1rem",
-              flexWrap: "wrap",
-              color: "#64748b",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <div className="detalhes-location">
+            <div className="location-item">
               <MapPin size={18} /> {imovel.endereco} - {imovel.bairro},{" "}
               {imovel.cidade}
             </div>
@@ -532,28 +182,16 @@ export const Detalhes = () => {
       {/* LAYOUT PRINCIPAL */}
       <div className="container details-layout">
         {/* COLUNA DA ESQUERDA */}
-        <div className="details-column-left" style={{ flex: 2 }}>
+        <div className="details-column-left">
           <ImageGallery images={imagens} />
 
-          {/* === AQUI ESTÁ A MÁGICA: Card de Preço SÓ PARA CELULAR === */}
+          {/* Card de Preço SÓ PARA CELULAR */}
           <div className="mobile-price-container">
-            <PriceCard />
+            <PriceCard imovel={imovel} />
           </div>
-          {/* ======================================================= */}
 
           {/* Grid de Características */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
-              gap: "1rem",
-              margin: "2rem 0",
-              padding: "1.5rem",
-              background: "#f8fafc",
-              borderRadius: "12px",
-              border: "1px solid #f1f5f9",
-            }}
-          >
+          <div className="features-grid">
             {[
               { icon: Maximize, label: "Área Útil", val: `${imovel.area} m²` },
               { icon: Bed, label: "Quartos", val: imovel.quartos },
@@ -565,60 +203,35 @@ export const Detalhes = () => {
               { icon: Bath, label: "Banheiros", val: imovel.banheiros },
               { icon: Car, label: "Vagas", val: imovel.vagas || "-" },
             ].map((item, idx) => (
-              <div key={idx} style={{ textAlign: "center" }}>
+              <div key={idx} className="feature-item">
                 <item.icon
                   size={24}
-                  style={{ color: "var(--primary)", marginBottom: "8px" }}
+                  className="feature-icon"
                 />
-                <div
-                  style={{
-                    fontWeight: "700",
-                    color: "#334155",
-                    fontSize: "1.1rem",
-                  }}
-                >
+                <div className="feature-value">
                   {item.val}
                 </div>
-                <div style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
+                <div className="feature-label">
                   {item.label}
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="description" style={{ marginBottom: "3rem" }}>
-            <h3
-              style={{
-                fontSize: "1.5rem",
-                color: "#1e293b",
-                marginBottom: "1rem",
-              }}
-            >
+          <div className="description-section">
+            <h3 className="section-title">
               Sobre o imóvel
             </h3>
-            <p
-              style={{
-                lineHeight: 1.8,
-                color: "#475569",
-                whiteSpace: "pre-line",
-                fontSize: "1.05rem",
-              }}
-            >
+            <p className="description-text">
               {imovel.descricao}
             </p>
           </div>
 
           <div>
-            <h3
-              style={{
-                fontSize: "1.5rem",
-                color: "#1e293b",
-                marginBottom: "1rem",
-              }}
-            >
+            <h3 className="section-title">
               Diferenciais
             </h3>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+            <div className="comodidades-list">
               {renderComodidade(imovel.piscina, "Piscina")}
               {renderComodidade(imovel.churrasqueira, "Churrasqueira")}
               {renderComodidade(imovel.elevador, "Elevador")}
@@ -630,16 +243,8 @@ export const Detalhes = () => {
         </div>
 
         {/* COLUNA DA DIREITA (Sidebar - SÓ PARA DESKTOP) */}
-        <aside
-          className="desktop-sidebar"
-          style={{
-            flex: 1,
-            position: "sticky",
-            top: "2rem",
-            height: "fit-content",
-          }}
-        >
-          <PriceCard />
+        <aside className="desktop-sidebar">
+          <PriceCard imovel={imovel} />
         </aside>
       </div>
     </div>

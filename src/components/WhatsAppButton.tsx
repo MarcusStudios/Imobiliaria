@@ -1,13 +1,15 @@
 // src/components/WhatsAppButton.tsx
+import { useWhatsApp } from "../contexts/WhatsAppContext";
 
 export const WhatsAppButton = () => {
+  const { message } = useWhatsApp();
   // Seu número formatado (DDI + DDD + Número)
   const phoneNumber = "5599991243054"; 
-  const message = encodeURIComponent("Olá! Vi um imóvel no site e gostaria de mais informações.");
+  const encodedMessage = encodeURIComponent(message);
 
   return (
     <a
-      href={`https://wa.me/${phoneNumber}?text=${message}`}
+      href={`https://wa.me/${phoneNumber}?text=${encodedMessage}`}
       target="_blank"
       rel="noopener noreferrer"
       className="whatsapp-float"

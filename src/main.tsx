@@ -6,17 +6,20 @@ import App from './App';
 import ScrollToTop from './components/ScrollToTop'; // <--- Importe aqui
 import { FavoritosProvider } from './contexts/FavoritosContext';
 import { AuthProvider } from './contexts/AuthContext'; // <--- 1. ADICIONE ISSO
+import { WhatsAppProvider } from './contexts/WhatsAppContext';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {/* 2. O AuthProvider tem que envolver tudo para o login funcionar */}
     <AuthProvider>
-      <FavoritosProvider>
-        <HashRouter> 
-          <ScrollToTop />
-          <App />
-        </HashRouter>
-      </FavoritosProvider>
+      <WhatsAppProvider>
+        <FavoritosProvider>
+          <HashRouter> 
+            <ScrollToTop />
+            <App />
+          </HashRouter>
+        </FavoritosProvider>
+      </WhatsAppProvider>
     </AuthProvider>
   </StrictMode>,
 );

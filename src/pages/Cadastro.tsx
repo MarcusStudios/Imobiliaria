@@ -2,14 +2,14 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react"; // <--- 1. Importando ícones
+import { Eye, EyeOff } from "lucide-react";
+import '../css/Cadastro.css';
 
 export const Cadastro = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
 
-  // 2. Estados para controlar a visibilidade das senhas (separados)
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -35,8 +35,9 @@ export const Cadastro = () => {
       setLoading(true);
       await register(email, password);
       navigate("/");
-    } catch (err: any) {
-      if (err.code === "auth/email-already-in-use") {
+    } catch (err: unknown) {
+      const firebaseError = err as { code?: string };
+      if (firebaseError.code === "auth/email-already-in-use") {
         setError("Este email já está cadastrado.");
       } else {
         setError("Falha ao criar conta. Tente novamente.");
@@ -46,35 +47,19 @@ export const Cadastro = () => {
     }
   };
 
-  // Estilo comum para o botão do olho
-  const eyeButtonStyle: React.CSSProperties = {
-    position: "absolute",
-    right: "10px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    color: "#64748b",
-    display: "flex",
-    alignItems: "center",
-  };
-
   return (
-    <div className="container" style={{ padding: "4rem 0", maxWidth: "400px" }}>
-      <div className="card" style={{ padding: "2rem" }}>
-        <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
+    <div className="container cadastro-container">
+      <div className="card cadastro-card">
+        <h2 className="cadastro-title">
           Criar Conta
         </h2>
         {error && (
-          <div
-            style={{ color: "red", marginBottom: "1rem", textAlign: "center" }}
-          >
+          <div className="error-message">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "1rem" }}>
+        <form onSubmit={handleSubmit} className="cadastro-form">
           {/* CAMPO EMAIL */}
           <div>
             <label className="label">Email</label>
@@ -83,7 +68,7 @@ export const Cadastro = () => {
               className="input-control"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu@email.com" // Placeholder
+              placeholder="seu@email.com"
               required
             />
           </div>
@@ -91,20 +76,19 @@ export const Cadastro = () => {
           {/* CAMPO SENHA */}
           <div>
             <label className="label">Senha</label>
-            <div style={{ position: "relative" }}>
+            <div className="input-wrapper">
               <input
                 type={showPassword ? "text" : "password"}
-                className="input-control"
+                className="input-control input-control-with-icon"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Crie uma senha forte" // Placeholder
-                style={{ paddingRight: "40px" }}
+                placeholder="Crie uma senha forte"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={eyeButtonStyle}
+                className="eye-button"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -114,20 +98,19 @@ export const Cadastro = () => {
           {/* CAMPO CONFIRMAR SENHA */}
           <div>
             <label className="label">Confirmar Senha</label>
-            <div style={{ position: "relative" }}>
+            <div className="input-wrapper">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                className="input-control"
+                className="input-control input-control-with-icon"
                 value={confirmPass}
                 onChange={(e) => setConfirmPass(e.target.value)}
-                placeholder="Repita a senha" // Placeholder
-                style={{ paddingRight: "40px" }}
+                placeholder="Repita a senha"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                style={eyeButtonStyle}
+                className="eye-button"
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -136,21 +119,18 @@ export const Cadastro = () => {
 
           <button
             type="submit"
-            className="btn-details"
-            style={{ width: "100%", marginTop: "1rem" }}
+            className="btn-details btn-submit"
             disabled={loading}
           >
             {loading ? "Criando..." : "Cadastrar"}
           </button>
         </form>
 
-        <div
-          style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.9rem" }}
-        >
+        <div className="login-link-wrapper">
           Já tem uma conta?{" "}
           <Link
             to="/login"
-            style={{ color: "var(--primary)", fontWeight: "bold" }}
+            className="login-link"
           >
             Entrar
           </Link>

@@ -19,5 +19,10 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    // ✅ ADICIONE ISSO:
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn', // any vira warning
+      'react-refresh/only-export-components': 'warn', // export vira warning
+    },
   },
 ])
