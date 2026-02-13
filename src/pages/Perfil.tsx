@@ -10,6 +10,8 @@ export const Perfil = () => {
   const { count } = useFavoritos();
   const navigate = useNavigate();
 
+  console.log("ola");
+
   const handleLogout = async () => {
     const confirm = window.confirm("Deseja realmente sair da conta?");
     if (confirm) {
