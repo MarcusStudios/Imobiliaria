@@ -1,0 +1,13 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Leitura pública de imagens
+      allow read: if true;
+      
+      // Escrita restrita ao Admin pelo UID (mesmo do Firestore)
+      allow write: if request.auth != null && 
+                   request.auth.uid == "UG2t4JLe6WgzQShgaBP83EfXgfy1";
+    }
+  }
+}

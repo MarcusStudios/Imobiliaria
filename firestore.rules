@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- REGRAS PARA IMÓVEIS ---
+    // Leitura: Pública (Todo mundo vê o site)
+    // Escrita: Restrita (Só o seu UID de Admin pode alterar)
+    match /imoveis/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == "UG2t4JLe6WgzQShgaBP83EfXgfy1";
+    }
+
+    // --- REGRAS PARA USUÁRIOS (Favoritos) ---
+    // Cada usuário só pode ler e gravar na própria pasta
+    // Isso é útil para salvar dados privados como perfil ou favoritos se for migrar para banco
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

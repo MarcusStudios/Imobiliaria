@@ -25,7 +25,12 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 // Email do administrador
-const ADMIN_EMAIL = "lidiany.lopes@exemplo.com"; 
+// UID do administrador (deve estar no .env)
+const ADMIN_UID = import.meta.env.VITE_ADMIN_UID;
+
+if (!ADMIN_UID) {
+  console.warn("ATENÇÃO: VITE_ADMIN_UID não definido no arquivo .env. As funcionalidades de admin não funcionarão.");
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -57,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register, 
       logout, 
       resetPassword,
-      isAdmin: user?.email === ADMIN_EMAIL 
+      isAdmin: user?.uid === ADMIN_UID 
     }}>
       {children}
     </AuthContext.Provider>
