@@ -19,7 +19,6 @@ import { ImageGallery } from "../components/ImageGallery";
 import { PriceCard } from "../components/PriceCard";
 import type { Imovel } from "../types";
 import { useAuth } from "../contexts/AuthContext";
-import { useWhatsApp } from "../contexts/WhatsAppContext";
 import "../css/Detalhes.css";
 
 export const Detalhes = () => {
@@ -28,7 +27,6 @@ export const Detalhes = () => {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const { isAdmin } = useAuth();
-  const { setMessage, resetMessage } = useWhatsApp();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -48,16 +46,7 @@ export const Detalhes = () => {
     fetchImovel();
   }, [id]);
 
-  useEffect(() => {
-    if (imovel) {
-      document.title = `${imovel.titulo} | Lidiany Lopes Corretora`;
-      setMessage(`Olá! Estou interessado no imóvel "${imovel.titulo}" (Código: ${id ? id.slice(0, 6).toUpperCase() : ""}) e gostaria de mais informações.`);
-    }
-    return () => {
-      document.title = "Lidiany Lopes Corretora de Imóveis";
-      resetMessage();
-    };
-  }, [imovel, id, setMessage, resetMessage]);
+ 
 
   const handleShare = () => {
     const url = window.location.href;

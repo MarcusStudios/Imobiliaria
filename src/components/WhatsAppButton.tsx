@@ -10,6 +10,7 @@ export const WhatsAppButton = () => {
   return (
     <a
       href={`https://wa.me/${phoneNumber}?text=${encodedMessage}`}
+      title="Falar no WhatsApp"
       target="_blank"
       rel="noopener noreferrer"
       className="whatsapp-float"
@@ -32,6 +33,7 @@ export const WhatsAppButton = () => {
       </svg>
 
       <span className="whatsapp-text">Falar com Corretora</span>
+      
     </a>
   );
 };

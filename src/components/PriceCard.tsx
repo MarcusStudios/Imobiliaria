@@ -8,7 +8,7 @@ interface PriceCardProps {
 
 export const PriceCard = ({ imovel }: PriceCardProps) => {
   const TELEFONE_CORRETORA = "+5599991243054";
-  const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiany! Vi o imóvel ${imovel.titulo.toUpperCase()} (Cód: ${imovel.id?.slice(0, 6)}) e gostaria de mais informações.`;
+  const linkZap = `https://wa.me/${TELEFONE_CORRETORA}?text=Olá Lidiany! Vi o imóvel ${imovel.titulo.toUpperCase()} (Cód: ${imovel.id?.slice(0, 6).toUpperCase()}) e gostaria de mais informações.`;
 
   return (
     <div className="price-card">
