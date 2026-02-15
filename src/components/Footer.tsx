@@ -26,11 +26,10 @@ export const Footer = () => {
 
           {/* 1. WhatsApp (Primeiro) */}
           <a
-            href="https://wa.me/5599991243054"
+            href="https://wa.me/5599991243054?text=Olá! Gostaria de mais informações sobre imóveis disponíveis na Lidiany Lopes Corretora." 
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link footer-contact-link"
-            /* Efeito Hover managed in CSS or inline if needed, but classes are better */
             style={{ color: "white" }} 
             onMouseOver={(e) => (e.currentTarget.style.color = "#25D366")}
             onMouseOut={(e) => (e.currentTarget.style.color = "white")}
