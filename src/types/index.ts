@@ -4,6 +4,8 @@ export interface Imovel {
   id: string;
   titulo: string;
   tipo: 'Venda' | 'Aluguel' | 'Ambos'; // Tipagem estrita ajuda a evitar erros de digitação
+  categoria?: 'Imovel' | 'Terreno'; // Diferenciação entre imóvel construído e terreno
+
   
   // Controle de Rascunho vs Publicado
   ativo?: boolean; 
@@ -43,6 +45,12 @@ export interface Imovel {
   mobiliado?: boolean;
   portaria?: boolean;
   aceitaPet?: boolean;
+
+  // Campos Específicos para Terrenos
+  dimensoes?: string; // Ex: 12x30
+  topografia?: 'Plano' | 'Aclive' | 'Declive';
+  zoneamento?: 'Residencial' | 'Comercial' | 'Misto' | 'Industrial' | 'Rural';
+
 
   // Mídia
   imagens: string[];

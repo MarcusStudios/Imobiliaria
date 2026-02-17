@@ -44,6 +44,15 @@ const CadastroImovel = lazy(() =>
   })),
 );
 
+
+// Import Cadastro Terreno
+const CadastroTerreno = lazy(() =>
+  import("./pages/CadastroTerreno").then((module) => ({
+    default: module.CadastroTerreno,
+  })),
+);
+
+
 // Componente de Loading
 const Loading = () => (
   <div
@@ -102,6 +111,25 @@ function App() {
               </RotaPrivada>
             }
           />
+
+          {/* Rotas para TERRENOS */}
+          <Route
+            path="/admin/terrenos/novo"
+            element={
+              <RotaPrivada>
+                <CadastroTerreno />
+              </RotaPrivada>
+            }
+          />
+          <Route
+            path="/admin/terrenos/editar/:id"
+            element={
+              <RotaPrivada>
+                <CadastroTerreno />
+              </RotaPrivada>
+            }
+          />
+
         </Routes>
       </Suspense>
 

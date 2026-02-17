@@ -34,14 +34,20 @@ export const AdminImovelList = ({
                 onClick={() => setFiltro(f)}
                 className={`filter-btn ${filtro === f ? 'active' : 'inactive'}`}
               >
-                {f === 'todos' ? 'Todos' : f === 'ativos' ? 'Ativos' : f}
+            {f === 'todos' ? 'Todos' : f === 'ativos' ? 'Ativos' : f}
               </button>
             ))}
           </div>
 
-          <Link to="/cadastro-imovel" className="btn-new">
-            <Plus size={20} /> Novo Imóvel
-          </Link>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Link to="/admin/terrenos/novo" className="btn-new" style={{ backgroundColor: '#10b981' }}>
+              <Plus size={20} /> Novo Terreno
+            </Link>
+            <Link to="/cadastro-imovel" className="btn-new">
+              <Plus size={20} /> Novo Imóvel
+            </Link>
+          </div>
+
         </div>
 
         {/* Busca */}
@@ -93,9 +99,10 @@ export const AdminImovelList = ({
               </div>
 
               <div className="item-actions">
-                <Link to={`/editar/${imovel.id}`} className="action-btn edit" title="Editar">
+                <Link to={imovel.categoria === 'Terreno' ? `/admin/terrenos/editar/${imovel.id}` : `/editar/${imovel.id}`} className="action-btn edit" title="Editar">
                   <Edit size={18} />
                 </Link>
+
 
                 <button
                   onClick={() => onToggleStatus(imovel.id, imovel.ativo ?? true)}
