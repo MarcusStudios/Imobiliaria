@@ -21,10 +21,11 @@ export const FilterBar = ({ filtros, setFiltros, ordem, setOrdem }: FilterBarPro
     <div className="filter-bar">
       {/* Busca por Texto */}
       <div className="filter-group flex-grow">
-        <label>Localização ou Nome</label>
+        <label htmlFor="busca-input">Localização ou Nome</label>
         <div className="input-wrapper">
           <Search size={18} className="input-icon" />
           <input
+            id="busca-input"
             type="text"
             className="input-control with-icon"
             placeholder="Ex: Centro, Apartamento..."
@@ -36,10 +37,11 @@ export const FilterBar = ({ filtros, setFiltros, ordem, setOrdem }: FilterBarPro
 
       {/* Tipo */}
       <div className="filter-group">
-        <label>Finalidade</label>
+        <label htmlFor="tipo-select">Finalidade</label>
         <div className="input-wrapper">
           <Filter size={18} className="input-icon" />
           <select
+            id="tipo-select"
             className="input-control with-icon"
             value={filtros.tipo}
             onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
@@ -53,8 +55,9 @@ export const FilterBar = ({ filtros, setFiltros, ordem, setOrdem }: FilterBarPro
 
       {/* Quartos */}
       <div className="filter-group">
-        <label>Quartos</label>
+        <label htmlFor="quartos-select">Quartos</label>
         <select
+          id="quartos-select"
           className="input-control"
           value={filtros.quartos}
           onChange={(e) => setFiltros({ ...filtros, quartos: Number(e.target.value) })}
@@ -68,8 +71,9 @@ export const FilterBar = ({ filtros, setFiltros, ordem, setOrdem }: FilterBarPro
 
       {/* Preço Máximo */}
       <div className="filter-group">
-        <label>Preço Máximo</label>
+        <label htmlFor="preco-input">Preço Máximo</label>
         <input
+          id="preco-input"
           type="number"
           className="input-control"
           placeholder="R$ Máximo"
@@ -80,8 +84,9 @@ export const FilterBar = ({ filtros, setFiltros, ordem, setOrdem }: FilterBarPro
 
        {/* Ordenação */}
        <div className="filter-group">
-        <label>Ordenar por</label>
+        <label htmlFor="ordem-select">Ordenar por</label>
         <select
+            id="ordem-select"
             value={ordem}
             onChange={(e) => setOrdem(e.target.value)}
             className="input-control"

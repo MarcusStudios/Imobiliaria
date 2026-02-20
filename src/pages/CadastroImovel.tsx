@@ -244,10 +244,11 @@ export const CadastroImovel = () => {
             
             <div className="grid-gap-1-5">
               <div>
-                <label className="form-label">
+                <label className="form-label" htmlFor="titulo-input">
                   Título do Anúncio *
                 </label>
                 <input 
+                  id="titulo-input"
                   name="titulo" 
                   value={formData.titulo} 
                   onChange={handleChange} 
@@ -259,10 +260,11 @@ export const CadastroImovel = () => {
 
               <div className="grid-cols-adaptive">
                 <div>
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="tipo-select">
                     Finalidade *
                   </label>
                   <select 
+                    id="tipo-select"
                     name="tipo" 
                     value={formData.tipo} 
                     onChange={handleChange} 
@@ -275,10 +277,11 @@ export const CadastroImovel = () => {
                 </div>
 
                 <div>
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="preco-input">
                     {formData.tipo === 'Aluguel' ? 'Valor do Aluguel (R$) *' : 'Valor de Venda (R$) *'}
                   </label>
                   <input 
+                    id="preco-input"
                     name="preco" 
                     type="number" 
                     value={formData.preco || ''} 
@@ -291,10 +294,11 @@ export const CadastroImovel = () => {
 
                 {formData.tipo === 'Ambos' && (
                   <div>
-                    <label className="form-label">
+                    <label className="form-label" htmlFor="preco-aluguel-input">
                       Valor do Aluguel (R$) *
                     </label>
                     <input 
+                      id="preco-aluguel-input"
                       name="precoAluguel" 
                       type="number" 
                       value={formData.precoAluguel || ''} 
@@ -317,10 +321,11 @@ export const CadastroImovel = () => {
             
             <div className="grid-gap-1-5">
               <div>
-                <label className="form-label">
+                <label className="form-label" htmlFor="endereco-input">
                   Endereço Completo *
                 </label>
                 <input 
+                  id="endereco-input"
                   name="endereco" 
                   value={formData.endereco} 
                   onChange={handleChange} 
@@ -332,10 +337,11 @@ export const CadastroImovel = () => {
 
               <div className="grid-cols-2">
                 <div>
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="bairro-input">
                     Bairro *
                   </label>
                   <input 
+                    id="bairro-input"
                     name="bairro" 
                     value={formData.bairro} 
                     onChange={handleChange} 
@@ -345,10 +351,11 @@ export const CadastroImovel = () => {
                   />
                 </div>
                 <div>
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="cidade-input">
                     Cidade
                   </label>
                   <input 
+                    id="cidade-input"
                     name="cidade" 
                     value={formData.cidade} 
                     onChange={handleChange} 
@@ -368,10 +375,11 @@ export const CadastroImovel = () => {
             
             <div className="grid-cols-small">
               <div>
-                <label className="form-label">
+                <label className="form-label" htmlFor="area-input">
                   Área (m²)
                 </label>
                 <input 
+                  id="area-input"
                   name="area" 
                   type="number" 
                   value={formData.area || ''} 
@@ -381,10 +389,11 @@ export const CadastroImovel = () => {
                 />
               </div>
               <div>
-                <label className="form-label">
+                <label className="form-label" htmlFor="quartos-input">
                   Quartos
                 </label>
                 <input 
+                  id="quartos-input"
                   name="quartos" 
                   type="number" 
                   value={formData.quartos || ''} 
@@ -394,10 +403,11 @@ export const CadastroImovel = () => {
                 />
               </div>
               <div>
-                <label className="form-label">
+                <label className="form-label" htmlFor="suites-input">
                   Suítes
                 </label>
                 <input 
+                  id="suites-input"
                   name="suites" 
                   type="number" 
                   value={formData.suites || ''} 
@@ -407,10 +417,11 @@ export const CadastroImovel = () => {
                 />
               </div>
               <div>
-                <label className="form-label">
+                <label className="form-label" htmlFor="banheiros-input">
                   Banheiros
                 </label>
                 <input 
+                  id="banheiros-input"
                   name="banheiros" 
                   type="number" 
                   value={formData.banheiros || ''} 
@@ -420,10 +431,11 @@ export const CadastroImovel = () => {
                 />
               </div>
               <div>
-                <label className="form-label">
+                <label className="form-label" htmlFor="vagas-input">
                   Vagas
                 </label>
                 <input 
+                  id="vagas-input"
                   name="vagas" 
                   type="number" 
                   value={formData.vagas || ''} 
@@ -443,10 +455,11 @@ export const CadastroImovel = () => {
             
             <div className="grid-cols-2">
               <div>
-                <label className="form-label">
+                <label className="form-label" htmlFor="condominio-input">
                   Condomínio (R$/mês)
                 </label>
                 <input 
+                  id="condominio-input"
                   name="condominio" 
                   type="number" 
                   value={formData.condominio || ''} 
@@ -456,10 +469,11 @@ export const CadastroImovel = () => {
                 />
               </div>
               <div>
-                <label className="form-label">
+                <label className="form-label" htmlFor="iptu-input">
                   IPTU (R$/ano)
                 </label>
                 <input 
+                  id="iptu-input"
                   name="iptu" 
                   type="number" 
                   value={formData.iptu || ''} 
@@ -489,8 +503,10 @@ export const CadastroImovel = () => {
                 <label 
                   key={comodidade.name}
                   className={`comodidade-label ${formData[comodidade.name as keyof typeof formData] ? 'active' : ''}`}
+                  htmlFor={`comodidade-${comodidade.name}`}
                 >
                   <input 
+                    id={`comodidade-${comodidade.name}`}
                     type="checkbox" 
                     name={comodidade.name} 
                     checked={formData[comodidade.name as keyof typeof formData] as boolean} 
@@ -514,19 +530,23 @@ export const CadastroImovel = () => {
             <div className="grid-gap-1-5">
               <div className="upload-area">
                 <input 
+                  id="image-upload"
                   type="file" 
                   accept="image/*" 
                   multiple 
                   onChange={handleImageSelect}
                   className="file-input"
+                  aria-label="Selecionar fotos do imóvel"
                 />
-                <Upload size={48} className="upload-icon" />
-                <p className="upload-title">
-                  Clique ou arraste fotos aqui
-                </p>
-                <p className="upload-hint">
-                  Máximo 10 fotos • JPG, PNG ou WEBP • Máx 5MB cada
-                </p>
+                <label htmlFor="image-upload" className="upload-label-wrapper" style={{ cursor: 'pointer', display: 'block', width: '100%' }}>
+                  <Upload size={48} className="upload-icon" />
+                  <p className="upload-title">
+                    Clique ou arraste fotos aqui
+                  </p>
+                  <p className="upload-hint">
+                    Máximo 10 fotos • JPG, PNG ou WEBP • Máx 5MB cada
+                  </p>
+                </label>
                 <p className="upload-counter">
                   {previewUrls.length}/10 fotos adicionadas
                 </p>
@@ -579,7 +599,9 @@ export const CadastroImovel = () => {
               📝 Descrição Detalhada
             </h3>
             
+            <label htmlFor="descricao-textarea" className="sr-only" aria-hidden="true" style={{ display: 'none' }}>Descrição</label>
             <textarea 
+              id="descricao-textarea"
               name="descricao" 
               rows={8} 
               value={formData.descricao} 
@@ -599,8 +621,9 @@ export const CadastroImovel = () => {
             </h3>
             
             <div className="grid-gap-1-5">
-              <label className="config-label">
+              <label className="config-label" htmlFor="ativo-checkbox">
                 <input 
+                  id="ativo-checkbox"
                   type="checkbox" 
                   name="ativo" 
                   checked={formData.ativo} 
@@ -617,8 +640,9 @@ export const CadastroImovel = () => {
                 </div>
               </label>
 
-              <label className={`config-label ${formData.destaque ? 'highlight' : ''}`}>
+              <label className={`config-label ${formData.destaque ? 'highlight' : ''}`} htmlFor="destaque-checkbox">
                 <input 
+                  id="destaque-checkbox"
                   type="checkbox" 
                   name="destaque" 
                   checked={formData.destaque} 
