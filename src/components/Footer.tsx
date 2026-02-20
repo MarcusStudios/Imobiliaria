@@ -78,7 +78,7 @@ export const Footer = () => {
             Todos os direitos reservados.
           </p>
 
-          <p className="texto-arco-iris footer-dev">
+          <p>
                      Desenvolvido por marcuseduardo846@gmail.com
           </p>
         </div>
