@@ -59,20 +59,21 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
               onClick={imagemAnterior}
               style={{
                 position: 'absolute',
-                left: '5px',
+                left: '8px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                background: 'rgba(255, 255, 255, 0.8)',
-                border: 'none',
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
                 borderRadius: '50%',
-                width: '30px',
-                height: '30px',
+                width: '32px',
+                height: '32px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
                 zIndex: 10,
-                color: '#333'
+                color: '#fff',
+                transition: 'all 0.2s ease',
               }}
             >
               <ChevronLeft size={20} />
@@ -82,39 +83,27 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
               onClick={proximaImagem}
               style={{
                 position: 'absolute',
-                right: '5px',
+                right: '8px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                background: 'rgba(255, 255, 255, 0.8)',
-                border: 'none',
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
                 borderRadius: '50%',
-                width: '30px',
-                height: '30px',
+                width: '32px',
+                height: '32px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
                 zIndex: 10,
-                color: '#333'
+                color: '#fff',
+                transition: 'all 0.2s ease',
               }}
             >
               <ChevronRight size={20} />
             </button>
             
-            {/* INDICADOR DE CONTAGEM (OPCIONAL) */}
-            <div style={{
-              position: 'absolute',
-              bottom: '10px',
-              right: '10px',
-              background: 'rgba(0,0,0,0.6)',
-              color: '#fff',
-              fontSize: '10px',
-              padding: '2px 6px',
-              borderRadius: '10px',
-              pointerEvents: 'none'
-            }}>
-              {indiceImagem + 1}/{listaImagens.length}
-            </div>
+            {/* INDICADOR DE CONTAGEM REMOVIDO PARA DESIGN MINIMALISTA */}
           </>
         )}
         

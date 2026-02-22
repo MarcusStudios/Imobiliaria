@@ -64,8 +64,8 @@ export const ImageGallery = ({ images }: ImageGalleryProps) => {
                   left: '1rem',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  border: 'none',
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  border: '1px solid rgba(255, 255, 255, 0.5)',
                   borderRadius: '50%',
                   width: '40px',
                   height: '40px',
@@ -73,10 +73,11 @@ export const ImageGallery = ({ images }: ImageGalleryProps) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                  transition: 'all 0.2s',
+                  color: '#fff',
                 }}
               >
-                <ChevronLeft size={24} color="#1e293b" />
+                <ChevronLeft size={24} />
               </button>
 
               <button
@@ -89,8 +90,8 @@ export const ImageGallery = ({ images }: ImageGalleryProps) => {
                   right: '1rem',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  border: 'none',
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  border: '1px solid rgba(255, 255, 255, 0.5)',
                   borderRadius: '50%',
                   width: '40px',
                   height: '40px',
@@ -98,10 +99,11 @@ export const ImageGallery = ({ images }: ImageGalleryProps) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                  transition: 'all 0.2s',
+                  color: '#fff',
                 }}
               >
-                <ChevronRight size={24} color="#1e293b" />
+                <ChevronRight size={24} />
               </button>
 
               {/* Contador de fotos */}
@@ -232,8 +234,8 @@ export const ImageGallery = ({ images }: ImageGalleryProps) => {
                   left: '2rem',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  border: 'none',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
                   borderRadius: '50%',
                   width: '48px',
                   height: '48px',
@@ -241,9 +243,11 @@ export const ImageGallery = ({ images }: ImageGalleryProps) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
+                  color: '#fff',
+                  transition: 'background 0.2s',
                 }}
               >
-                <ChevronLeft size={28} color="#1e293b" />
+                <ChevronLeft size={28} />
               </button>
 
               <button
@@ -256,8 +260,8 @@ export const ImageGallery = ({ images }: ImageGalleryProps) => {
                   right: '2rem',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  border: 'none',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
                   borderRadius: '50%',
                   width: '48px',
                   height: '48px',
@@ -265,9 +269,11 @@ export const ImageGallery = ({ images }: ImageGalleryProps) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
+                  color: '#fff',
+                  transition: 'background 0.2s',
                 }}
               >
-                <ChevronRight size={28} color="#1e293b" />
+                <ChevronRight size={28} />
               </button>
 
               <div
