@@ -2,21 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://marcusstudios.github.io/Imobiliaria/</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2025-02-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-  <!-- Adicione aqui páginas de listagem de imóveis, sobre, contato, etc -->
 </urlset>
-```
-
-**Além disso**, para impedir que o Google tente indexar as páginas privadas, crie um `robots.txt` na raiz com:
-```
-User-agent: *
-Disallow: /Imobiliaria/login
-Disallow: /Imobiliaria/cadastro
-Disallow: /Imobiliaria/favoritos
-Disallow: /Imobiliaria/perfil
-Disallow: /Imobiliaria/recuperar-senha
-
-Sitemap: https://marcusstudios.github.io/Imobiliaria/sitemap.xml
