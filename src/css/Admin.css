@@ -254,6 +254,7 @@
   border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .search-wrapper {
@@ -278,6 +279,7 @@
   outline: none;
   background: var(--bg-card);
   color: var(--text-main);
+  box-sizing: border-box;
 }
 
 /* Property List */
@@ -307,6 +309,7 @@
   padding: 1rem 1.5rem;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-light);
+  gap: 1rem;
 }
 
 .imovel-item.inactive {
@@ -328,6 +331,7 @@
   gap: 1rem;
   align-items: center;
   flex: 1;
+  min-width: 0;
 }
 
 .imovel-thumb {
@@ -336,6 +340,12 @@
   object-fit: cover;
   border-radius: 8px;
   border: 2px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.imovel-details {
+  min-width: 0;
+  flex: 1;
 }
 
 .imovel-details h4 {
@@ -346,6 +356,7 @@
   align-items: center;
   gap: 0.5rem;
   color: var(--text-main);
+  flex-wrap: wrap;
 }
 
 .badge-destaque {
@@ -387,6 +398,7 @@
 .item-actions {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .action-btn {
@@ -431,4 +443,168 @@
   padding: 3rem;
   color: var(--secondary);
   background: var(--bg-card);
+}
+
+/* ================================================
+   RESPONSIVE BREAKPOINTS
+   ================================================ */
+
+/* Tablet grande / Desktop pequeno — até 1024px */
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet — até 768px */
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .admin-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-value {
+    font-size: 2rem;
+  }
+
+  .stat-number {
+    font-size: 1.6rem;
+  }
+
+  .stat-number.currency {
+    font-size: 1.25rem;
+  }
+
+  .actions-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-new {
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+  }
+
+  .filter-buttons {
+    width: 100%;
+  }
+
+  .filter-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .imovel-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .imovel-info {
+    width: 100%;
+  }
+
+  .item-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .imovel-thumb {
+    width: 64px;
+    height: 64px;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile — até 480px */
+@media (max-width: 480px) {
+  .admin-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .admin-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+  }
+
+  .secondary-stats-card {
+    padding: 1rem;
+  }
+
+  .actions-bar {
+    padding: 1rem;
+  }
+
+  .chart-card {
+    padding: 1rem;
+  }
+
+  .list-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .imovel-item {
+    padding: 0.75rem 1rem;
+  }
+
+  .imovel-thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .imovel-details h4 {
+    font-size: 0.9rem;
+  }
+
+  .imovel-meta {
+    font-size: 0.8rem;
+  }
+
+  .action-btn {
+    padding: 8px;
+  }
+
+  .item-actions {
+    gap: 0.35rem;
+  }
+
+  .filter-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .btn-new {
+    padding: 0.65rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .empty-state-list {
+    padding: 2rem 1rem;
+  }
 }
