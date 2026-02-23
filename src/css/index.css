@@ -15,11 +15,14 @@
   /* BORDAS DOS INPUTS */
   --input-border: #cbd5e1;  /* Cinza Sólido (Borda Padrão) */
   --input-focus: #2563eb;   /* Azul (Borda Focada) */
+  --border-light: #e2e8f0;  /* Borda leve clara */
   
   --radius: 12px;
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
+
+
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -37,12 +40,11 @@ body {
 /* --- HEADER --- */
 .header {
   position: sticky; top: 0; z-index: 1000;
-  background: rgba(255, 0, 0, 0.95);
-  border-bottom: 4px solid #e2e8f0; /* Borda inferior mais grossa */
+  background: var(--bg-card); /* Mudança para ficar igual ao card (branco ou escuro) e não vermelho */
+  border-bottom: 4px solid var(--input-border); 
   padding: 0.8rem 0;
   box-shadow: var(--shadow-lg);
   backdrop-filter: saturate(187%) blur(20px);
-  
 }
 .header-content { display: flex; align-items: center; justify-content: space-between; }
 .logo {
@@ -88,7 +90,7 @@ nav { display: flex; gap: 0.5rem; }
   border: 2px solid var(--input-border); 
   
   border-radius: 8px; font-size: 1rem; color: var(--text-main);
-  background-color: white;
+  background-color: var(--bg-card); /* Ajustado para acompanhar o card */
   transition: all 0.2s; height: 48px;
   font-weight: 500; /* Texto um pouco mais grosso para ler melhor */
 }
@@ -107,8 +109,8 @@ label.label {
 
 /* --- PAINEL ADMIN --- */
 form section {
-  background-color: white;
-  border: 2px solid #e2e8f0; /* Borda grossa nas seções */
+  background-color: var(--bg-card);
+  border: 2px solid var(--border-light); /* Borda grossa nas seções */
   padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;
 }
 form section h3 {
@@ -123,7 +125,7 @@ form section h3 {
   background: var(--bg-card); padding: 2rem;
   border-radius: var(--radius); box-shadow: var(--shadow-lg);
   margin-bottom: 3rem; position: relative; z-index: 10;
-  border: 2px solid #e2e8f0; /* Borda em volta da busca */
+  border: 2px solid var(--border-light); /* Borda em volta da busca */
   border-top: 5px solid var(--primary); /* Topo bem grosso */
 }
 .search-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1.5rem; align-items: end; }
@@ -136,7 +138,7 @@ form section h3 {
 
 .card {
   background: var(--bg-card); border-radius: var(--radius);
-  border: 1px solid #cbd5e1; /* Borda do card */
+  border: 1px solid var(--input-border); /* Borda do card */
   box-shadow: var(--shadow-sm);
   display: flex; flex-direction: column; overflow: hidden;
   transition: all 0.3s ease; position: relative;
@@ -148,7 +150,7 @@ form section h3 {
   border-width: 1px; /* Mantém fina para elegância */
 }
 
-.card-img-wrapper { height: 280px; position: relative; background: #e2e8f0; border-bottom: 1px solid #cbd5e1; }
+.card-img-wrapper { height: 280px; position: relative; background: var(--bg-page); border-bottom: 1px solid var(--input-border); }
 .card-img { width: 100%; height: 100%; object-fit: cover; }
 
 .badge-type {
@@ -161,11 +163,11 @@ form section h3 {
 
 .btn-fav {
   position: absolute; top: 12px; right: 12px;
-  background: white; border: 2px solid #e2e8f0; /* Borda grossa no botão fav */
+  background: var(--bg-card); border: 2px solid var(--border-light); /* Borda grossa no botão fav */
   width: 40px; height: 40px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  color: #94a3b8; transition: all 0.2s;
+  color: var(--secondary); transition: all 0.2s;
 }
 .btn-fav:hover { transform: scale(1.1); color: #ef4444; border-color: #fca5a5; }
 .btn-fav.active { color: #ef4444; border-color: #fca5a5; background: #fef2f2; }
@@ -177,13 +179,13 @@ form section h3 {
 .features-row {
   display: flex; gap: 1.2rem; margin-bottom: 1.5rem;
   color: var(--secondary); font-size: 0.9rem;
-  border-top: 2px solid #f1f5f9; padding-top: 1rem;
+  border-top: 2px solid var(--bg-page); padding-top: 1rem;
 }
 .feat { display: flex; align-items: center; gap: 6px; font-weight: 500; }
 
 .btn-details {
   margin-top: auto; display: block; text-align: center;
-  background: var(--text-main); color: white;
+  background: var(--primary); color: white;
   padding: 0.9rem; border-radius: 8px; text-decoration: none;
   font-weight: 700; cursor: pointer; width: 100%; border: none;
   transition: background 0.2s;
@@ -193,9 +195,9 @@ form section h3 {
 /* --- LOGIN --- */
 .auth-container { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
 .auth-card {
-  background: white; padding: 3rem; border-radius: var(--radius);
+  background: var(--bg-card); padding: 3rem; border-radius: var(--radius);
   box-shadow: var(--shadow-lg); width: 100%; max-width: 450px; text-align: center;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--border-light);
   border-top: 5px solid var(--primary);
 }
 

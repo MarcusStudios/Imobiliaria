@@ -9,14 +9,15 @@ import {
   ArrowLeft,
   CheckCircle2,
   Edit,
-  Share2,
   Clock,
   CalendarCheck,
+  Share2,
 } from "lucide-react";
-import { doc, getDoc, type Timestamp } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, query, where, limit, type Timestamp } from "firebase/firestore";
 import { db } from "../../services/firebaseConfig";
 import { ImageGallery } from "../components/ImageGallery";
 import { PriceCard } from "../components/PriceCard";
+import { ImovelCard } from "../components/ImovelCard";
 import type { Imovel } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import "../css/Detalhes.css";
@@ -24,6 +25,7 @@ import "../css/Detalhes.css";
 export const Detalhes = () => {
   const { id } = useParams<{ id: string }>();
   const [imovel, setImovel] = useState<Imovel | null>(null);
+  const [relacionados, setRelacionados] = useState<Imovel[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const { isAdmin } = useAuth();
@@ -32,10 +34,28 @@ export const Detalhes = () => {
     window.scrollTo(0, 0);
     const fetchImovel = async () => {
       if (!id) return;
+      setLoading(true);
       try {
         const docSnap = await getDoc(doc(db, "imoveis", id));
         if (docSnap.exists()) {
-          setImovel({ id: docSnap.id, ...docSnap.data() } as Imovel);
+          const dados = { id: docSnap.id, ...docSnap.data() } as Imovel;
+          setImovel(dados);
+          
+          // Buscar imóveis relacionados (mesmo tipo e categoria)
+          const q = query(
+            collection(db, "imoveis"),
+            where("tipo", "==", dados.tipo),
+            where("ativo", "==", true),
+            limit(5) // Busca 5 para garantir 4 caso o atual esteja no meio
+          );
+          
+          const relSnap = await getDocs(q);
+          const relData = relSnap.docs
+            .map(d => ({ id: d.id, ...d.data() } as Imovel))
+            .filter(i => i.id !== id && i.categoria === dados.categoria)
+            .slice(0, 4); // Pega maximo 4
+            
+          setRelacionados(relData);
         }
       } catch (error) {
         console.error(error);
@@ -45,23 +65,6 @@ export const Detalhes = () => {
     };
     fetchImovel();
   }, [id]);
-
- 
-
-  const handleShare = () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({
-        title: imovel?.titulo,
-        text: `Confira este imóvel: ${imovel?.titulo}`,
-        url: url,
-      });
-    } else {
-      navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   if (loading)
     return (
@@ -100,6 +103,30 @@ export const Detalhes = () => {
     );
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = imovel.titulo || "Confira este imóvel";
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          url,
+        });
+      } catch (error) {
+        console.log("Erro ao compartilhar", error);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (error) {
+        console.error("Erro ao copiar link", error);
+      }
+    }
+  };
+
   return (
     <div className="detalhes-page">
       {/* CABEÇALHO */}
@@ -110,8 +137,16 @@ export const Detalhes = () => {
             <ArrowLeft size={20} /> Voltar
           </Link>
           <div className="detalhes-actions">
-            <button onClick={handleShare} className="btn-share">
-              <Share2 size={16} /> {copied ? "Copiado!" : "Compartilhar"}
+            <button 
+              className="btn-share" 
+              onClick={handleShare}
+              style={copied ? { color: 'var(--success)', borderColor: 'var(--success)', backgroundColor: '#f0fdf4' } : {}}
+            >
+              {copied ? (
+                <><CheckCircle2 size={16} /> Copiado!</>
+              ) : (
+                <><Share2 size={16} /> Compartilhar</>
+              )}
             </button>
             {isAdmin && (
               <Link
@@ -236,6 +271,22 @@ export const Detalhes = () => {
           <PriceCard imovel={imovel} />
         </aside>
       </div>
+
+      {/* SEÇÃO DE IMÓVEIS RELACIONADOS */}
+      {relacionados.length > 0 && (
+        <div style={{ backgroundColor: 'var(--bg-page)', padding: '4rem 0', marginTop: '4rem', borderTop: '1px solid #e2e8f0' }}>
+          <div className="container">
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '2rem', color: 'var(--text-main)' }}>
+              Você também pode se interessar
+            </h2>
+            <div className="imoveis-grid">
+              {relacionados.map(rel => (
+                <ImovelCard key={rel.id} imovel={rel} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

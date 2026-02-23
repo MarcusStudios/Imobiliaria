@@ -66,7 +66,7 @@ export const Perfil = () => {
             </div>
 
             <h1 className="perfil-name">
-              {user.displayName || "Usuário sem nome"}
+              {user.displayName || (user.email ? user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1) : "Usuário")}
             </h1>
             
             <div className="perfil-email">

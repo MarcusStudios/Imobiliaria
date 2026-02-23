@@ -1,5 +1,5 @@
 .detalhes-page {
-  background: #fff;
+  background: var(--bg-page);
   padding-bottom: 4rem;
 }
 
@@ -37,12 +37,12 @@
   align-items: center;
   gap: 5px;
   padding: 0.5rem 1rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--input-border);
   border-radius: 8px;
-  background: white;
+  background: var(--bg-card);
   cursor: pointer;
   font-size: 0.9rem;
-  color: #475569;
+  color: var(--secondary);
   transition: all 0.2s;
 }
 
@@ -83,13 +83,13 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg-page);
+  color: var(--secondary);
   padding: 4px 12px;
   border-radius: 4px;
   font-size: 0.8rem;
   font-weight: 600;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-light);
 }
 
 .detalhes-dates {
@@ -110,7 +110,7 @@
 
 .detalhes-title {
   font-size: 2rem;
-  color: #1e293b;
+  color: var(--text-main);
   margin-bottom: 0.5rem;
   line-height: 1.2;
 }
@@ -161,9 +161,9 @@
   gap: 1rem;
   margin: 2rem 0;
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--bg-page);
   border-radius: 12px;
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--border-light);
 }
 
 .feature-item {
@@ -177,7 +177,7 @@
 
 .feature-value {
   font-weight: 700;
-  color: #334155;
+  color: var(--text-main);
   font-size: 1.1rem;
 }
 
@@ -193,7 +193,7 @@
 
 .section-title {
   font-size: 1.5rem;
-  color: #1e293b;
+  color: var(--text-main);
   margin-bottom: 1rem;
 }
 
@@ -215,21 +215,21 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-page);
+  border: 1px solid var(--border-light);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 0.9rem;
-  color: #334155;
+  color: var(--text-main);
   font-weight: 500;
 }
 
 /* Price Card Styles */
 .price-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--input-border);
   border-radius: 12px;
   padding: 1.5rem;
-  background: #fff;
+  background: var(--bg-card);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
@@ -252,7 +252,7 @@
 .rent-container {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px dashed #e2e8f0;
+  border-top: 1px dashed var(--input-border);
 }
 
 .rent-label {
@@ -268,7 +268,7 @@
 }
 
 .extra-costs {
-  background: #f8fafc;
+  background: var(--bg-page);
   padding: 1rem;
   border-radius: 8px;
   margin: 1.5rem 0;
@@ -293,7 +293,7 @@
 }
 
 .cost-value {
-  color: #334155;
+  color: var(--text-main);
   font-weight: 600;
 }
 

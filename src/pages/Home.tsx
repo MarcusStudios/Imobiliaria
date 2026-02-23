@@ -14,6 +14,7 @@ export const Home = () => {
   // Estado dos filtros
   const [filtros, setFiltros] = useState({
     busca: "",
+    categoria: "Todos",
     tipo: "Todos",
     quartos: 0,
     maxPreco: 0,
@@ -57,6 +58,11 @@ export const Home = () => {
         imovel.endereco.toLowerCase().includes(termoBusca) ||
         (imovel.bairro && imovel.bairro.toLowerCase().includes(termoBusca));
 
+      // Categoria (Terreno vs Imóvel)
+      const matchCategoria = 
+        filtros.categoria === "Todos" || 
+        (filtros.categoria === "Terreno" ? imovel.categoria === "Terreno" : imovel.categoria !== "Terreno");
+
       // Tipo
       const matchTipo =
         filtros.tipo === "Todos" ||
@@ -78,22 +84,32 @@ export const Home = () => {
       // Quartos
       const matchQuartos = Number(imovel.quartos) >= filtros.quartos;
 
-      return matchTexto && matchTipo && matchQuartos && matchPreco;
+      return matchTexto && matchCategoria && matchTipo && matchQuartos && matchPreco;
     });
   }, [listaImoveis, filtros]);
 
   // 2. Lógica de Ordenação (Memoized)
   const listaFinal = useMemo(() => {
     return [...imoveisFiltrados].sort((a, b) => {
+      // Prioridade para imóveis em destaque
+      if (a.destaque && !b.destaque) return -1;
+      if (!a.destaque && b.destaque) return 1;
+
+      // Ordenação selecionada
       if (ordem === "menor_preco") return a.preco - b.preco;
       if (ordem === "maior_preco") return b.preco - a.preco;
-      return 0; // recente (ordem original)
+      
+      // Data de criação decrescente (mais recentes primeiro)
+      const dateA = a.criadoEm?.toMillis?.() || 0;
+      const dateB = b.criadoEm?.toMillis?.() || 0;
+      return dateB - dateA;
     });
   }, [imoveisFiltrados, ordem]);
 
   const handleClearFilters = () => {
     setFiltros({
       busca: "",
+      categoria: "Todos",
       tipo: "Todos",
       quartos: 0,
       maxPreco: 0,

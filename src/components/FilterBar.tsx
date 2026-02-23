@@ -3,6 +3,7 @@ import "../css/Home.css";
 
 interface Filtros {
   busca: string;
+  categoria: string;
   tipo: string;
   quartos: number;
   maxPreco: number;
@@ -35,6 +36,24 @@ export const FilterBar = ({ filtros, setFiltros, ordem, setOrdem }: FilterBarPro
         </div>
       </div>
 
+      {/* Categoria */}
+      <div className="filter-group">
+        <label htmlFor="categoria-select">Categoria</label>
+        <div className="input-wrapper">
+          <Filter size={18} className="input-icon" />
+          <select
+            id="categoria-select"
+            className="input-control with-icon"
+            value={filtros.categoria}
+            onChange={(e) => setFiltros({ ...filtros, categoria: e.target.value })}
+          >
+            <option value="Todos">Todos</option>
+            <option value="Imovel">Imóveis</option>
+            <option value="Terreno">Terrenos</option>
+          </select>
+        </div>
+      </div>
+
       {/* Tipo */}
       <div className="filter-group">
         <label htmlFor="tipo-select">Finalidade</label>
@@ -46,7 +65,7 @@ export const FilterBar = ({ filtros, setFiltros, ordem, setOrdem }: FilterBarPro
             value={filtros.tipo}
             onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
           >
-            <option value="Todos">Todos</option>
+            <option value="Todos">Todas</option>
             <option value="Venda">Comprar</option>
             <option value="Aluguel">Alugar</option>
           </select>

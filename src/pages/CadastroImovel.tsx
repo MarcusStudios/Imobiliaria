@@ -39,6 +39,48 @@ export const CadastroImovel = () => {
     destaque: false
   });
 
+  const fillWithMockData = () => {
+    setFormData({
+      titulo: 'Casa de Teste ' + Math.floor(Math.random() * 1000),
+      descricao: 'Descrição genérica de um imóvel adorável, espaçoso e bem localizado para testes rápidos do sistema. Possui vários acabamentos modernos, excelente iluminação natural, e está pronto para morar.',
+      tipo: 'Venda',
+      preco: 300000 + Math.floor(Math.random() * 500000),
+      precoAluguel: 0,
+      endereco: 'Rua de Teste, ' + Math.floor(Math.random() * 1000),
+      bairro: 'Bairro Genérico',
+      cidade: 'Açailândia',
+      area: 150 + Math.floor(Math.random() * 100),
+      quartos: 3,
+      suites: 1,
+      banheiros: 2,
+      vagas: 2,
+      condominio: 300,
+      iptu: 1500,
+      piscina: true,
+      churrasqueira: true,
+      elevador: false,
+      mobiliado: false,
+      portaria: false,
+      aceitaPet: true,
+      imagens: [
+        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80', 
+        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'
+      ],
+      lat: -15.5518,
+      lng: -54.2980,
+      ativo: true,
+      destaque: true
+    });
+    setPreviewUrls([
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'
+    ]);
+    setSelectedFiles([]);
+    setErrors([]);
+  };
+
   useEffect(() => {
     if (id) {
       const carregarDados = async () => {
@@ -211,12 +253,37 @@ export const CadastroImovel = () => {
             <ArrowLeft size={18} /> Voltar ao painel
           </Link>
           
-          <h1 className="page-title">
-            {id ? "✏️ Editar Imóvel" : "🏠 Cadastrar Novo Imóvel"}
-          </h1>
-          <p className="page-subtitle">
-            {id ? "Atualize as informações do imóvel" : "Preencha os dados do novo imóvel"}
-          </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '15px' }}>
+            <div>
+              <h1 className="page-title">
+                {id ? "✏️ Editar Imóvel" : "🏠 Cadastrar Novo Imóvel"}
+              </h1>
+              <p className="page-subtitle">
+                {id ? "Atualize as informações do imóvel" : "Preencha os dados do novo imóvel"}
+              </p>
+            </div>
+            
+            {!id && (
+              <button 
+                type="button" 
+                onClick={fillWithMockData}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#e0e7ff',
+                  border: '1px solid #c7d2fe',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontWeight: '500',
+                  color: '#4f46e5'
+                }}
+              >
+                🪄 Preencher com Dados de Teste
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Alertas de Erro */}

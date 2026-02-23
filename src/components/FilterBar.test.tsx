@@ -8,7 +8,7 @@ describe('Acessibilidade e Comportamento do FilterBar', () => {
   const mockSetOrdem = vi.fn();
 
   const defaultProps = {
-    filtros: { busca: '', tipo: 'Todos', quartos: 0, maxPreco: 0 },
+    filtros: { busca: '', tipo: 'Todos', categoria: '', quartos: 0, maxPreco: 0 },
     setFiltros: mockSetFiltros,
     ordem: 'recente',
     setOrdem: mockSetOrdem,

@@ -18,7 +18,7 @@
 }
 
 .admin-header p {
-  color: #64748b;
+  color: var(--secondary);
   font-size: 0.95rem;
 }
 
@@ -66,8 +66,8 @@
 
 /* Secondary Stats Grid */
 .secondary-stats-card {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   padding: 1.5rem;
   border-radius: 12px;
 }
@@ -89,7 +89,7 @@
   margin: 0;
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-main);
 }
 
 .stat-number.red { color: #ef4444; }
@@ -105,8 +105,8 @@
 }
 
 .chart-card {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   padding: 1.5rem;
   border-radius: 12px;
 }
@@ -114,7 +114,7 @@
 .chart-title {
   margin: 0 0 1.5rem;
   font-size: 1.1rem;
-  color: #1e293b;
+  color: var(--text-main);
 }
 
 /* Price Distribution */
@@ -136,13 +136,13 @@
 .price-value {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-main);
 }
 
 .price-bar-bg {
   width: 100%;
   height: 8px;
-  background: #f1f5f9;
+  background: var(--bg-page);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -167,8 +167,8 @@
   border-radius: 6px;
 }
 
-.top-viewed-item.highlight { background: #fef3c7; }
-.top-viewed-item.normal { background: #f8fafc; }
+.top-viewed-item.highlight { background: rgba(251, 191, 36, 0.15); }
+.top-viewed-item.normal { background: var(--bg-page); }
 
 .rank-badge {
   font-weight: 700;
@@ -201,8 +201,8 @@
 
 /* Actions Bar */
 .actions-bar {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   padding: 1.5rem;
   border-radius: 12px;
   margin-bottom: 1.5rem;
@@ -239,8 +239,8 @@
 }
 
 .filter-btn.inactive {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--bg-page);
+  color: var(--secondary);
 }
 
 .btn-new {
@@ -272,30 +272,32 @@
 .search-input {
   width: 100%;
   padding: 0.75rem 0.75rem 0.75rem 2.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--input-border);
   border-radius: 8px;
   font-size: 0.95rem;
   outline: none;
+  background: var(--bg-card);
+  color: var(--text-main);
 }
 
 /* Property List */
 .imoveis-list-container {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: 12px;
   overflow: hidden;
 }
 
 .list-header {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-page);
 }
 
 .list-header h3 {
   margin: 0;
   font-size: 1.1rem;
-  color: #1e293b;
+  color: var(--text-main);
 }
 
 .imovel-item {
@@ -303,14 +305,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .imovel-item.inactive {
   opacity: 0.6;
-  background: #f8fafc;
-  border-left: 4px solid #94a3b8;
+  background: var(--bg-page);
+  border-left: 4px solid var(--secondary);
 }
 
 .imovel-item.active {
@@ -333,7 +335,7 @@
   height: 80px;
   object-fit: cover;
   border-radius: 8px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--border-light);
 }
 
 .imovel-details h4 {
@@ -343,6 +345,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: var(--text-main);
 }
 
 .badge-destaque {
@@ -426,6 +429,6 @@
 .empty-state-list {
   text-align: center;
   padding: 3rem;
-  color: #94a3b8;
-  background: white;
+  color: var(--secondary);
+  background: var(--bg-card);
 }

@@ -95,7 +95,7 @@ html, body {
     right: -100%; /* Começa escondido na direita */
     width: 75%;   /* Ocupa 75% da tela */
     height: 100vh;
-    background-color: white;
+    background-color: var(--bg-card);
     flex-direction: column; /* Itens um embaixo do outro */
     justify-content: center;
     align-items: center;
@@ -152,7 +152,7 @@ html, body {
               url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80');
   background-size: cover;
   background-position: center;
-  color: white;
+  color: #f8fafc;
   padding: 6rem 0;
   text-align: center;
   margin-bottom: 3rem;
@@ -246,7 +246,7 @@ html, body {
   top: 1rem;
   left: 1rem;
   background: rgba(15, 23, 42, 0.8);
-  color: white;
+  color: #f8fafc;
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -259,7 +259,7 @@ html, body {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: white;
+  background: var(--bg-card);
   border: none;
   width: 36px;
   height: 36px;
@@ -423,7 +423,7 @@ textarea.input-control {
 }
 
 .modal-box {
-  background: white;
+  background: var(--bg-card);
   padding: 2rem;
   border-radius: 16px;
   width: 90%;
@@ -446,12 +446,12 @@ textarea.input-control {
 
 .modal-box h3 {
   margin-bottom: 0.5rem;
-  color: #1e293b;
+  color: var(--text-main);
   font-size: 1.25rem;
 }
 
 .modal-box p {
-  color: #64748b;
+  color: var(--secondary);
   margin-bottom: 1.5rem;
   font-size: 0.95rem;
 }
@@ -464,9 +464,9 @@ textarea.input-control {
 
 .btn-cancel {
   padding: 0.6rem 1.2rem;
-  border: 1px solid #cbd5e1;
-  background: white;
-  color: #475569;
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  color: var(--secondary);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;

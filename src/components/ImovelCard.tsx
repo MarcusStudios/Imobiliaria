@@ -52,6 +52,29 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
           {imovel.tipo === 'Ambos' ? 'Venda/Aluguel' : imovel.tipo}
         </span>
 
+        {imovel.destaque && (
+          <span style={{
+            position: 'absolute',
+            top: '44px',
+            left: '12px',
+            background: 'linear-gradient(135deg, #f59e0b, #ea580c)',
+            color: 'white',
+            padding: '4px 8px',
+            borderRadius: '6px',
+            fontSize: '0.7rem',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            zIndex: 15,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            border: '1px solid rgba(255,255,255,0.3)'
+          }}>
+            ⭐ Destaque
+          </span>
+        )}
+
         {/* SETAS DE NAVEGAÇÃO (Só aparecem se tiver mais de 1 imagem) */}
         {listaImagens.length > 1 && (
           <>
@@ -149,9 +172,19 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
         </p>
 
         <div className="features-row">
-          <span className="feat"><Bed size={16} /> {imovel.quartos}</span>
-          <span className="feat"><Bath size={16} /> {imovel.banheiros}</span>
-          <span className="feat"><Maximize size={16} /> {imovel.area}m²</span>
+          {imovel.categoria === 'Terreno' ? (
+            <>
+              <span className="feat" title="Área Total"><Maximize size={16} /> {imovel.area}m²</span>
+              {imovel.dimensoes && <span className="feat" title="Dimensões">📐 {imovel.dimensoes}</span>}
+              <span className="feat" style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748b', border: '1px solid #e2e8f0', padding: '2px 6px', borderRadius: '4px', background: '#f8fafc' }}>Terreno</span>
+            </>
+          ) : (
+            <>
+              <span className="feat" title="Quartos"><Bed size={16} /> {imovel.quartos}</span>
+              <span className="feat" title="Banheiros"><Bath size={16} /> {imovel.banheiros}</span>
+              <span className="feat" title="Área"><Maximize size={16} /> {imovel.area}m²</span>
+            </>
+          )}
         </div>
         
         <Link to={`/imovel/${imovel.id}`} className="btn-details">Ver Detalhes</Link>

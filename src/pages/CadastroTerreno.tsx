@@ -65,6 +65,52 @@ export const CadastroTerreno = () => {
     destaque: false
   });
 
+  const fillWithMockData = () => {
+    setFormData({
+      titulo: 'Terreno de Teste ' + Math.floor(Math.random() * 1000),
+      descricao: 'Excelente terreno plano, pronto para construir. Localização privilegiada com fácil acesso e infraestrutura completa. Ótima oportunidade de investimento.',
+      tipo: 'Venda',
+      categoria: 'Terreno',
+      preco: 100000 + Math.floor(Math.random() * 200000),
+      precoAluguel: 0,
+      endereco: 'Avenida de Teste, ' + Math.floor(Math.random() * 1000),
+      bairro: 'Bairro Genérico',
+      cidade: 'Açailândia',
+      dimensoes: '12x30',
+      topografia: 'Plano',
+      zoneamento: 'Residencial',
+      area: 360 + Math.floor(Math.random() * 100),
+      quartos: 0,
+      suites: 0,
+      banheiros: 0,
+      vagas: 0,
+      condominio: 150,
+      iptu: 500,
+      piscina: false,
+      churrasqueira: false,
+      elevador: false,
+      mobiliado: false,
+      portaria: false,
+      aceitaPet: false,
+      imagens: [
+        'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1595844730298-b960fa25e985?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80'
+      ],
+      lat: -15.5518,
+      lng: -54.2980,
+      ativo: true,
+      destaque: true
+    });
+    setPreviewUrls([
+      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1595844730298-b960fa25e985?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80'
+    ]);
+    setSelectedFiles([]);
+    setErrors([]);
+  };
+
   useEffect(() => {
     if (id) {
       const carregarDados = async () => {
@@ -242,12 +288,37 @@ export const CadastroTerreno = () => {
             <ArrowLeft size={18} /> Voltar ao painel
           </Link>
           
-          <h1 className="page-title">
-            {id ? "✏️ Editar Terreno" : "🏞️ Cadastrar Novo Terreno"}
-          </h1>
-          <p className="page-subtitle">
-            {id ? "Atualize as informações do terreno" : "Preencha os dados do novo terreno"}
-          </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '15px' }}>
+            <div>
+              <h1 className="page-title">
+                {id ? "✏️ Editar Terreno" : "🏞️ Cadastrar Novo Terreno"}
+              </h1>
+              <p className="page-subtitle">
+                {id ? "Atualize as informações do terreno" : "Preencha os dados do novo terreno"}
+              </p>
+            </div>
+
+            {!id && (
+              <button 
+                type="button" 
+                onClick={fillWithMockData}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#e0e7ff',
+                  border: '1px solid #c7d2fe',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontWeight: '500',
+                  color: '#4f46e5'
+                }}
+              >
+                🪄 Preencher com Dados de Teste
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Alertas de Erro */}
