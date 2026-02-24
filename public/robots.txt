@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://marcusstudios.github.io/Imobiliaria/sitemap.xml
+Sitemap: https://moriaimoveisacai.com.br/sitemap.xml
 
