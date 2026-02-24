@@ -13,7 +13,7 @@ import {
   CalendarCheck,
   Share2,
 } from "lucide-react";
-import { doc, getDoc, collection, getDocs, query, where, limit, type Timestamp } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, query, where, limit, updateDoc, increment, type Timestamp } from "firebase/firestore";
 import { db } from "../../services/firebaseConfig";
 import { ImageGallery } from "../components/ImageGallery";
 import { PriceCard } from "../components/PriceCard";
@@ -41,6 +41,19 @@ export const Detalhes = () => {
           const dados = { id: docSnap.id, ...docSnap.data() } as Imovel;
           setImovel(dados);
           
+          // Incrementar visualizações caso não seja um admin
+          console.log(`[Viewer] Administrador logado: ${isAdmin}`);
+          if (!isAdmin) {
+            console.log(`[Viewer] Incrementando visualização para o imóvel: ${id}`);
+            updateDoc(doc(db, "imoveis", id), {
+              visualizacoes: increment(1)
+            })
+            .then(() => console.log("[Viewer] Visualização registrada com sucesso no Firebase!"))
+            .catch(err => console.error("[Viewer] Erro ao registrar visualização:", err));
+          } else {
+            console.log("[Viewer] Visualização ignorada: Usuários administradores não contam nas estatísticas.");
+          }
+          
           // Buscar imóveis relacionados (mesmo tipo e categoria)
           const q = query(
             collection(db, "imoveis"),
@@ -64,7 +77,7 @@ export const Detalhes = () => {
       }
     };
     fetchImovel();
-  }, [id]);
+  }, [id, isAdmin]);
 
   if (loading)
     return (

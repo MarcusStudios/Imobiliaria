@@ -8,6 +8,9 @@ service cloud.firestore {
     match /imoveis/{document=**} {
       allow read: if true;
       allow write: if request.auth != null && request.auth.uid == "UG2t4JLe6WgzQShgaBP83EfXgfy1";
+      // Permite que qualquer pessoa incremente as visualizações em +1
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visualizacoes'])
+                    && request.resource.data.visualizacoes == resource.data.get('visualizacoes', 0) + 1;
     }
 
     // --- REGRAS PARA USUÁRIOS (Favoritos) ---
