@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { ImovelCard } from '../components/ImovelCard';
 import { useFavoritos } from '../contexts/FavoritosContext';
+import { useSEO } from '../hooks/useSEO';
 
 export const Favoritos = () => {
-  // O contexto já nos dá a lista de imóveis completa (Imovel[])
-  // Não precisamos mais buscar no banco de dados aqui!
+  useSEO({ title: 'Meus Favoritos', description: 'Seus imóveis favoritos salvos para consulta rápida.' });
   const { favoritos } = useFavoritos();
 
   return (

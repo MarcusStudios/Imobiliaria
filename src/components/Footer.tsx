@@ -61,11 +61,9 @@ export const Footer = () => {
           </a>
 
           {/* 3. Email (Último - Texto Simples) */}
-          <div className="footer-email-container">
             <p className="footer-email">
-              ✉️ moriaimoveis.atendimento@gmail.com.br
+              ✉️ moriaimoveis.atendimento@gmail.com
             </p>
-          </div>
         </div>
 
         <div>

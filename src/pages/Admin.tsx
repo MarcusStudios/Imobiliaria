@@ -1,6 +1,6 @@
 // src/pages/Admin.tsx
 import { useEffect, useState, useMemo } from 'react';
-import { db } from '../../services/firebaseConfig';
+import { db } from '../services/firebaseConfig';
 import { 
   collection, 
   getDocs, 
@@ -12,6 +12,7 @@ import { DashboardStats } from '../components/DashboardStats';
 import { DashboardCharts } from '../components/DashboardCharts';
 import { AdminImovelList } from '../components/AdminImovelList';
 import { type Imovel } from '../types';
+import { useSEO } from '../hooks/useSEO';
 import '../css/Admin.css';
 
 interface Estatisticas {
@@ -27,6 +28,7 @@ interface Estatisticas {
 }
 
 export const Admin = () => {
+  useSEO({ title: 'Painel Administrativo', description: 'Dashboard de gerenciamento de imóveis.' });
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState('todos'); // todos, venda, aluguel, rascunho
@@ -55,8 +57,8 @@ export const Admin = () => {
 
   // Calcular Estatísticas (Memoized)
   const stats = useMemo((): Estatisticas => {
-    const agora = new Date();
-    const umMesAtras = new Date(agora.setDate(agora.getDate() - 30));
+    const umMesAtras = new Date();
+    umMesAtras.setDate(umMesAtras.getDate() - 30);
 
     return {
       totalImoveis: imoveis.length,
@@ -66,7 +68,11 @@ export const Admin = () => {
       totalVisualizacoes: imoveis.reduce((acc, i) => acc + (i.visualizacoes || 0), 0),
       cadastradosUltimos30Dias: imoveis.filter(i => {
         if (!i.criadoEm) return false;
-        const dataCriacao = i.criadoEm.toDate ? i.criadoEm.toDate() : new Date(i.criadoEm);
+        const dataCriacao = 'toDate' in i.criadoEm
+          ? i.criadoEm.toDate()
+          : i.criadoEm instanceof Date
+            ? i.criadoEm
+            : new Date();
         return dataCriacao >= umMesAtras;
       }).length,
       semFoto: imoveis.filter(i => !i.imagens || i.imagens.length === 0).length,

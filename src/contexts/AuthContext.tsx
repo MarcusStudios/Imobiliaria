@@ -1,6 +1,6 @@
 // src/contexts/AuthContext.tsx
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { auth } from '../../services/firebaseConfig'; // Ajuste o caminho se necessário
+import { auth } from '../services/firebaseConfig';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 

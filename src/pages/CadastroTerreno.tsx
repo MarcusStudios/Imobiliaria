@@ -1,6 +1,6 @@
 // src/pages/CadastroTerreno.tsx
 import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
-import { db } from '../../services/firebaseConfig';
+import { db } from '../services/firebaseConfig';
 import { collection, addDoc, doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { Imovel } from '../types';
@@ -13,11 +13,13 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import '../css/CadastroTerreno.css';
+import { useToast } from '../contexts/ToastContext';
+import '../css/CadastroForm.css';
 
 export const CadastroTerreno = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -127,7 +129,7 @@ export const CadastroTerreno = () => {
             });
             setPreviewUrls(dadosSemId.imagens || []);
           } else {
-            alert("Imóvel não encontrado!");
+            showToast('Imóvel não encontrado!', 'error');
             navigate('/admin');
           }
         } catch (error) {
@@ -160,13 +162,13 @@ export const CadastroTerreno = () => {
     
     const totalFotos = previewUrls.length + filesArray.length;
     if (totalFotos > 10) {
-      alert(`Você pode adicionar no máximo 10 fotos. Atualmente há ${previewUrls.length} foto(s).`);
+      showToast(`Máximo 10 fotos. Atualmente há ${previewUrls.length} foto(s).`, 'warning');
       return;
     }
 
     const arquivosGrandes = filesArray.filter(f => f.size > 5 * 1024 * 1024);
     if (arquivosGrandes.length > 0) {
-      alert('Algumas imagens são muito grandes (máx 5MB). Por favor, comprima-as antes de fazer upload.');
+      showToast('Algumas imagens são muito grandes (máx 5MB).', 'warning');
       return;
     }
 
@@ -258,19 +260,19 @@ export const CadastroTerreno = () => {
           ...dadosFinais,
           atualizadoEm: serverTimestamp(),
         });
-        alert("✅ Terreno atualizado com sucesso!");
+        showToast('Terreno atualizado com sucesso!', 'success');
       } else {
         await addDoc(collection(db, "imoveis"), {
           ...dadosFinais,
           criadoEm: serverTimestamp(),
         });
-        alert("✅ Terreno cadastrado com sucesso!");
+        showToast('Terreno cadastrado com sucesso!', 'success');
       }
       navigate('/admin');
     } catch (error) { 
       console.error("Erro ao salvar:", error);
       const msg = error instanceof Error ? error.message : "Erro desconhecido";
-      alert("❌ Erro ao salvar: " + msg);
+      showToast("Erro ao salvar: " + msg, 'error');
     } finally {
       setLoading(false);
       setUploadingImages(false);

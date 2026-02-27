@@ -1,5 +1,13 @@
 // src/types.ts
 
+// Tipo que representa um Timestamp do Firebase ou uma Date/string JavaScript
+export interface FirebaseTimestamp {
+  toDate: () => Date;
+  toMillis: () => number;
+  seconds: number;
+  nanoseconds: number;
+}
+
 export interface Imovel {
   id: string;
   titulo: string;
@@ -57,8 +65,6 @@ export interface Imovel {
   
   // Metadados
   visualizacoes?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  criadoEm?: any; // Timestamp do Firebase (pode ser Date ou Timestamp)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  atualizadoEm?: any; // Timestamp da última atualização
+  criadoEm?: FirebaseTimestamp | Date | null;
+  atualizadoEm?: FirebaseTimestamp | Date | null;
 }

@@ -1,7 +1,11 @@
 // src/services/cloudinaryService.ts
 
-const CLOUD_NAME = 'dj16hchjj'; // Substitua pelo seu cloud name
-const UPLOAD_PRESET = 'imoveis_preset'; // Crie um unsigned preset no Cloudinary
+const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as string;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as string;
+
+if (!CLOUD_NAME || !UPLOAD_PRESET) {
+  console.error('ERRO: Variáveis VITE_CLOUDINARY_CLOUD_NAME ou VITE_CLOUDINARY_UPLOAD_PRESET não definidas no .env');
+}
 
 interface CloudinaryResponse {
   secure_url: string;

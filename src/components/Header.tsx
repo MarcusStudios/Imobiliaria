@@ -50,7 +50,7 @@ export const Header = () => {
           {/* Navegação Desktop */}
           <nav className="nav-desktop">
             <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Início</Link>
-            <Link to="/" className="nav-link">Comprar</Link>
+            <Link to="/" state={{ filtroTipo: 'comprar' }} className="nav-link">Comprar</Link>
             <Link to="/sobre-nos" className={`nav-link ${location.pathname === '/sobre-nos' ? 'active' : ''}`} onClick={closeMenu}>Sobre Nós</Link>
             <Link to="/favoritos" className={`nav-link ${location.pathname === '/favoritos' ? 'active' : ''}`}>
               Favoritos {count > 0 && <span className="fav-count">{count}</span>}

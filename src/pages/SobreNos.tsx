@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { Award, ShieldCheck, HeartHandshake, MessageCircle } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 import '../css/SobreNos.css';
 
 export const SobreNos = () => {
+  useSEO({ title: 'Sobre Nós', description: 'Conheça Lidiany Lopes e a Moriá Imóveis. Corretora com mais de uma década de experiência no mercado imobiliário de Açailândia.' });
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

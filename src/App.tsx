@@ -56,6 +56,13 @@ const CadastroTerreno = lazy(() =>
   })),
 );
 
+// Import Página 404
+const NaoEncontrado = lazy(() =>
+  import("./pages/NaoEncontrado").then((module) => ({
+    default: module.NaoEncontrado,
+  })),
+);
+
 
 // Componente de Loading
 const Loading = () => (
@@ -134,6 +141,9 @@ function App() {
               </RotaPrivada>
             }
           />
+
+          {/* Rota catch-all — Página 404 */}
+          <Route path="*" element={<NaoEncontrado />} />
 
         </Routes>
       </Suspense>

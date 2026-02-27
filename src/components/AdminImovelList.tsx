@@ -77,9 +77,10 @@ export const AdminImovelList = ({
             >
               <div className="imovel-info">
                 <img 
-                  src={imovel.imagens?.[0] || 'https://via.placeholder.com/100x100?text=Sem+Foto'} 
+                  src={imovel.imagens?.[0] || '/sem-foto.png'} 
                   alt="Capa" 
                   className="imovel-thumb"
+                  loading="lazy"
                 />
                 <div className="imovel-details">
                   <h4>{imovel.titulo} {imovel.destaque && <span className="badge-destaque">⭐ DESTAQUE</span>}</h4>

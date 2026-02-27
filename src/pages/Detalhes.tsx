@@ -13,18 +13,23 @@ import {
   CalendarCheck,
   Share2,
 } from "lucide-react";
-import { doc, getDoc, collection, getDocs, query, where, limit, updateDoc, increment, type Timestamp } from "firebase/firestore";
-import { db } from "../../services/firebaseConfig";
+import { doc, getDoc, collection, getDocs, query, where, limit, updateDoc, increment } from "firebase/firestore";
+import { db } from "../services/firebaseConfig";
 import { ImageGallery } from "../components/ImageGallery";
 import { PriceCard } from "../components/PriceCard";
 import { ImovelCard } from "../components/ImovelCard";
-import type { Imovel } from "../types";
+import type { Imovel, FirebaseTimestamp } from "../types";
 import { useAuth } from "../contexts/AuthContext";
+import { useSEO } from "../hooks/useSEO";
 import "../css/Detalhes.css";
 
 export const Detalhes = () => {
   const { id } = useParams<{ id: string }>();
   const [imovel, setImovel] = useState<Imovel | null>(null);
+  useSEO({
+    title: imovel ? `${imovel.titulo} - ${imovel.cidade}` : 'Carregando imóvel...',
+    description: imovel ? `${imovel.tipo} em ${imovel.bairro}, ${imovel.cidade}. ${imovel.quartos} quartos, ${imovel.area}m². Lidiany Lopes - Moriá Imóveis.` : undefined,
+  });
   const [relacionados, setRelacionados] = useState<Imovel[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -90,13 +95,11 @@ export const Detalhes = () => {
   const imagens =
     imovel.imagens && imovel.imagens.length > 0
       ? imovel.imagens
-      : ["https://via.placeholder.com/800x400?text=Sem+Foto"];
+      : ["/sem-foto.png"];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const formatarData = (timestamp: any | Timestamp) => {
+  const formatarData = (timestamp: FirebaseTimestamp | Date | null | undefined) => {
     if (!timestamp) return "";
-    // Verifica se tem o método toDate (Timestamp do Firebase)
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const date = 'toDate' in timestamp ? timestamp.toDate() : timestamp;
     return new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(date);
   };
 

@@ -1,15 +1,22 @@
 // src/pages/Home.tsx
 import { useState, useEffect, useMemo } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../services/firebaseConfig";
+import { db } from "../services/firebaseConfig";
+import { useLocation } from "react-router-dom";
 import { ImovelCard } from "../components/ImovelCard";
 import { FilterBar } from "../components/FilterBar";
 import type { Imovel } from "../types";
+import { useSEO } from "../hooks/useSEO";
 import "../css/Home.css";
 
+const ITEMS_PER_PAGE = 12;
+
 export const Home = () => {
+  useSEO({ title: 'Imóveis em Açailândia', description: 'Encontre casas, apartamentos e terrenos para compra e aluguel em Açailândia e região. Lidiany Lopes - Moriá Imóveis.' });
   const [listaImoveis, setListaImoveis] = useState<Imovel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const location = useLocation();
 
   // Estado dos filtros
   const [filtros, setFiltros] = useState({
@@ -21,22 +28,30 @@ export const Home = () => {
   });
 
   // Estado da Ordenação
-  const [ordem, setOrdem] = useState("recente"); // recente, menor_preco, maior_preco
+  const [ordem, setOrdem] = useState("recente");
 
-  // Busca dados reais do Firebase
+  // Integrar o state do link "Comprar" do Header
+  useEffect(() => {
+    const state = location.state as { filtroTipo?: string } | null;
+    if (state?.filtroTipo) {
+      setFiltros(prev => ({ ...prev, tipo: state.filtroTipo! }));
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  // Busca todos os imóveis do Firebase
   useEffect(() => {
     const fetchImoveis = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "imoveis"));
-        const data = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Imovel[];
+        const data = querySnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }) as Imovel)
+          .filter((imovel) => imovel.ativo !== false);
 
-        // Filtra para mostrar apenas os ativos
-        const imoveisAtivos = data.filter((imovel) => imovel.ativo !== false);
-
-        setListaImoveis(imoveisAtivos);
+        setListaImoveis(data);
       } catch (error) {
         console.error("Erro ao buscar imóveis:", error);
       } finally {
@@ -46,20 +61,23 @@ export const Home = () => {
     fetchImoveis();
   }, []);
 
+  // Resetar visibleCount quando filtros mudam
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [filtros, ordem]);
+
   // 1. Lógica de Filtro (Memoized)
   const imoveisFiltrados = useMemo(() => {
     return listaImoveis.filter((imovel) => {
-      // Texto
       const termoBusca = (filtros.busca || "").toLowerCase();
       const matchTexto =
-        !termoBusca || // Fast failse se a busca estiver vazia
+        !termoBusca ||
         (imovel.titulo && imovel.titulo.toLowerCase().includes(termoBusca)) ||
         (imovel.cidade && imovel.cidade.toLowerCase().includes(termoBusca)) ||
         (imovel.id && imovel.id.toLowerCase().includes(termoBusca)) ||
         (imovel.endereco && imovel.endereco.toLowerCase().includes(termoBusca)) ||
         (imovel.bairro && imovel.bairro.toLowerCase().includes(termoBusca));
 
-      // Categoria (Terreno vs Imóvel Geral)
       let matchCategoria = true;
       if (filtros.categoria === "terrenos") {
         matchCategoria = imovel.categoria === "Terreno";
@@ -67,7 +85,6 @@ export const Home = () => {
         matchCategoria = imovel.categoria !== "Terreno";
       }
 
-      // Tipo (Venda / Aluguel)
       let matchTipo = true;
       if (filtros.tipo === "comprar") {
         matchTipo = imovel.tipo === "Venda" || imovel.tipo === "Ambos";
@@ -75,7 +92,6 @@ export const Home = () => {
         matchTipo = imovel.tipo === "Aluguel" || imovel.tipo === "Ambos";
       }
 
-      // Preço (Inteligente para 'Ambos')
       let precoParaVerificar = imovel.preco || 0;
       if (
         filtros.tipo === "alugar" &&
@@ -87,7 +103,6 @@ export const Home = () => {
       const matchPreco =
         filtros.maxPreco === 0 || precoParaVerificar <= filtros.maxPreco;
 
-      // Quartos
       const matchQuartos = Number(imovel.quartos || 0) >= filtros.quartos;
 
       return matchTexto && matchCategoria && matchTipo && matchQuartos && matchPreco;
@@ -95,22 +110,23 @@ export const Home = () => {
   }, [listaImoveis, filtros]);
 
   // 2. Lógica de Ordenação (Memoized)
-  const listaFinal = useMemo(() => {
+  const listaOrdenada = useMemo(() => {
     return [...imoveisFiltrados].sort((a, b) => {
-      // Prioridade para imóveis em destaque
       if (a.destaque && !b.destaque) return -1;
       if (!a.destaque && b.destaque) return 1;
 
-      // Ordenação selecionada
       if (ordem === "menor_preco") return a.preco - b.preco;
       if (ordem === "maior_preco") return b.preco - a.preco;
       
-      // Data de criação decrescente (mais recentes primeiro)
-      const dateA = a.criadoEm?.toMillis?.() || 0;
-      const dateB = b.criadoEm?.toMillis?.() || 0;
-      return dateB - dateA;
+      const getMs = (ts: typeof a.criadoEm) =>
+        ts && 'toMillis' in ts ? ts.toMillis() : ts instanceof Date ? ts.getTime() : 0;
+      return getMs(b.criadoEm) - getMs(a.criadoEm);
     });
   }, [imoveisFiltrados, ordem]);
+
+  // 3. Paginação client-side
+  const listaFinal = listaOrdenada.slice(0, visibleCount);
+  const hasMore = visibleCount < listaOrdenada.length;
 
   const handleClearFilters = () => {
     setFiltros({
@@ -130,7 +146,6 @@ export const Home = () => {
           <p>As melhores oportunidades de compra e aluguel na sua região.</p>
 
           <div className="hero-filter-wrapper">
-            {/* Barra de Filtros Componentizada */}
             <FilterBar
               filtros={filtros}
               setFiltros={setFiltros}
@@ -143,29 +158,41 @@ export const Home = () => {
       </div>
 
       <div className="container">
-        {/* Grid de Resultados */}
         {loading ? (
           <p className="loading-state">Carregando imóveis...</p>
         ) : (
-          <div className="grid imoveis-grid">
-            {listaFinal.length > 0 ? (
-              listaFinal.map((imovel) => (
-                <ImovelCard key={imovel.id} imovel={imovel} />
-              ))
-            ) : (
-              // ESTADO VAZIO PROFISSIONAL
-              <div className="empty-state">
-                <span className="empty-icon">🔍</span>
-                <h3 className="empty-title">Nenhum imóvel encontrado</h3>
-                <p className="empty-desc">
-                  Tente ajustar seus filtros ou remover algumas restrições.
-                </p>
-                <button onClick={handleClearFilters} className="btn-clear">
-                  Limpar Filtros
+          <>
+            <div className="grid imoveis-grid">
+              {listaFinal.length > 0 ? (
+                listaFinal.map((imovel) => (
+                  <ImovelCard key={imovel.id} imovel={imovel} />
+                ))
+              ) : (
+                <div className="empty-state">
+                  <span className="empty-icon">🔍</span>
+                  <h3 className="empty-title">Nenhum imóvel encontrado</h3>
+                  <p className="empty-desc">
+                    Tente ajustar seus filtros ou remover algumas restrições.
+                  </p>
+                  <button onClick={handleClearFilters} className="btn-clear">
+                    Limpar Filtros
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Botão Carregar Mais */}
+            {hasMore && (
+              <div className="load-more-container">
+                <button
+                  className="btn-load-more"
+                  onClick={() => setVisibleCount(prev => prev + ITEMS_PER_PAGE)}
+                >
+                  Carregar Mais Imóveis ({listaOrdenada.length - visibleCount} restantes)
                 </button>
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
     </div>

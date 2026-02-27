@@ -1,7 +1,7 @@
 // src/contexts/FavoritosContext.tsx
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
-import { db } from '../../services/firebaseConfig';
+import { db } from '../services/firebaseConfig';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 
 // Importando o tipo do arquivo separado
