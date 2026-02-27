@@ -1,6 +1,6 @@
 // src/components/ImovelCard.tsx
 import { useState } from 'react'; // IMPORTANTE: Importar useState
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Bed, Bath, Maximize, MapPin, Heart, ChevronLeft, ChevronRight } from 'lucide-react'; // Adicionei as setas
 import type { Imovel } from '../types';
 import { useFavoritos } from '../contexts/FavoritosContext';
@@ -12,6 +12,7 @@ interface ImovelCardProps {
 export const ImovelCard = ({ imovel }: ImovelCardProps) => {
   const { toggleFavorito, isFavorito } = useFavoritos();
   const isFav = isFavorito(imovel.id);
+  const navigate = useNavigate();
 
   // 1. ESTADO PARA CONTROLAR A IMAGEM ATUAL NO CARD
   const [indiceImagem, setIndiceImagem] = useState(0);
@@ -37,7 +38,11 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
   const formatar = (val: number) => Number(val).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   return (
-    <div className="card" style={{ position: 'relative' }}>
+    <div 
+      className="card" 
+      style={{ position: 'relative', cursor: 'pointer' }}
+      onClick={() => navigate(`/imovel/${imovel.id}`)}
+    >
       <div className="card-img-wrapper" style={{ position: 'relative', overflow: 'hidden' }}>
         
         {/* IMAGEM ATUAL DO CARROSSEL */}
@@ -45,7 +50,7 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
           src={listaImagens[indiceImagem]} 
           alt={imovel.titulo} 
           className="card-img" 
-          style={{ width: '100%', height: '200px', objectFit: 'cover' }} // Garante tamanho fixo
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }} // Puxa o tamanho do wrapper via CSS
         />
         
         <span className="badge-type">
@@ -187,7 +192,13 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
           )}
         </div>
         
-        <Link to={`/imovel/${imovel.id}`} className="btn-details">Ver Detalhes</Link>
+        <Link 
+          to={`/imovel/${imovel.id}`} 
+          className="btn-details"
+          onClick={(e) => e.stopPropagation()} // Evita duplo clique com o card
+        >
+          Ver Detalhes
+        </Link>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@
 /* Banner superior estilizado */
 .perfil-header-bg {
   height: 200px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  background: var(--bg-color); /* Matches header dark green */
   position: relative;
   overflow: hidden;
 }
@@ -82,8 +82,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-page);
-  color: var(--primary);
+  background: #f0fdf4; /* Light green background */
+  color: #16a34a; /* Green icon */
 }
 
 /* Nome e Email */
@@ -111,9 +111,9 @@
   align-items: center;
   gap: 6px;
   padding: 0.5rem 1rem;
-  background: var(--bg-page);
-  color: var(--primary);
-  border: 1px solid var(--border-light);
+  background: #f0fdf4; /* Light green */
+  color: #16a34a; /* Green text */
+  border: 1px solid #bbf7d0; /* Green border */
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 700;

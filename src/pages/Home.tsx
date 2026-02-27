@@ -14,8 +14,8 @@ export const Home = () => {
   // Estado dos filtros
   const [filtros, setFiltros] = useState({
     busca: "",
-    categoria: "Todos",
-    tipo: "Todos",
+    categoria: "",
+    tipo: "",
     quartos: 0,
     maxPreco: 0,
   });
@@ -50,29 +50,35 @@ export const Home = () => {
   const imoveisFiltrados = useMemo(() => {
     return listaImoveis.filter((imovel) => {
       // Texto
-      const termoBusca = filtros.busca.toLowerCase();
+      const termoBusca = (filtros.busca || "").toLowerCase();
       const matchTexto =
-        imovel.titulo.toLowerCase().includes(termoBusca) ||
-        imovel.cidade.toLowerCase().includes(termoBusca) ||
-        imovel.id.toLowerCase().includes(termoBusca) ||
-        imovel.endereco.toLowerCase().includes(termoBusca) ||
+        !termoBusca || // Fast failse se a busca estiver vazia
+        (imovel.titulo && imovel.titulo.toLowerCase().includes(termoBusca)) ||
+        (imovel.cidade && imovel.cidade.toLowerCase().includes(termoBusca)) ||
+        (imovel.id && imovel.id.toLowerCase().includes(termoBusca)) ||
+        (imovel.endereco && imovel.endereco.toLowerCase().includes(termoBusca)) ||
         (imovel.bairro && imovel.bairro.toLowerCase().includes(termoBusca));
 
-      // Categoria (Terreno vs Imóvel)
-      const matchCategoria = 
-        filtros.categoria === "Todos" || 
-        (filtros.categoria === "Terreno" ? imovel.categoria === "Terreno" : imovel.categoria !== "Terreno");
+      // Categoria (Terreno vs Imóvel Geral)
+      let matchCategoria = true;
+      if (filtros.categoria === "terrenos") {
+        matchCategoria = imovel.categoria === "Terreno";
+      } else if (filtros.categoria === "imoveis") {
+        matchCategoria = imovel.categoria !== "Terreno";
+      }
 
-      // Tipo
-      const matchTipo =
-        filtros.tipo === "Todos" ||
-        imovel.tipo === filtros.tipo ||
-        imovel.tipo === "Ambos";
+      // Tipo (Venda / Aluguel)
+      let matchTipo = true;
+      if (filtros.tipo === "comprar") {
+        matchTipo = imovel.tipo === "Venda" || imovel.tipo === "Ambos";
+      } else if (filtros.tipo === "alugar") {
+        matchTipo = imovel.tipo === "Aluguel" || imovel.tipo === "Ambos";
+      }
 
       // Preço (Inteligente para 'Ambos')
-      let precoParaVerificar = imovel.preco;
+      let precoParaVerificar = imovel.preco || 0;
       if (
-        filtros.tipo === "Aluguel" &&
+        filtros.tipo === "alugar" &&
         imovel.tipo === "Ambos" &&
         imovel.precoAluguel
       ) {
@@ -82,7 +88,7 @@ export const Home = () => {
         filtros.maxPreco === 0 || precoParaVerificar <= filtros.maxPreco;
 
       // Quartos
-      const matchQuartos = Number(imovel.quartos) >= filtros.quartos;
+      const matchQuartos = Number(imovel.quartos || 0) >= filtros.quartos;
 
       return matchTexto && matchCategoria && matchTipo && matchQuartos && matchPreco;
     });
@@ -109,8 +115,8 @@ export const Home = () => {
   const handleClearFilters = () => {
     setFiltros({
       busca: "",
-      categoria: "Todos",
-      tipo: "Todos",
+      categoria: "",
+      tipo: "",
       quartos: 0,
       maxPreco: 0,
     });
@@ -122,19 +128,21 @@ export const Home = () => {
         <div className="container hero-content">
           <h1>Seu novo lar está aqui.</h1>
           <p>As melhores oportunidades de compra e aluguel na sua região.</p>
+
+          <div className="hero-filter-wrapper">
+            {/* Barra de Filtros Componentizada */}
+            <FilterBar
+              filtros={filtros}
+              setFiltros={setFiltros}
+              ordem={ordem}
+              setOrdem={setOrdem}
+              onClear={handleClearFilters}
+            />
+          </div>
         </div>
       </div>
 
       <div className="container">
-        {/* Barra de Filtros Componentizada */}
-        <FilterBar
-          filtros={filtros}
-          setFiltros={setFiltros}
-          ordem={ordem}
-          setOrdem={setOrdem}
-          onClear={handleClearFilters}
-        />
-
         {/* Grid de Resultados */}
         {loading ? (
           <p className="loading-state">Carregando imóveis...</p>

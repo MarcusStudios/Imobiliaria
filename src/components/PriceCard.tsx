@@ -1,4 +1,4 @@
-import { MapPin, Building, Clock } from 'lucide-react';
+import { MapPin, Building, Zap } from 'lucide-react';
 import type { Imovel } from '../types';
 import '../css/Detalhes.css';
 
@@ -91,7 +91,7 @@ export const PriceCard = ({ imovel }: PriceCardProps) => {
       {/* Info Horário */}
       <div className="quick-reply-info">
         <div className="reply-badge">
-          <Clock size={14} /> Resposta rápida
+          <Zap size={16} fill="currentColor" /> Resposta rápida
         </div>
       </div>
     </div>

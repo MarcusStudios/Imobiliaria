@@ -25,6 +25,10 @@ const Favoritos = lazy(() =>
   import("./pages/Favoritos").then((module) => ({ default: module.Favoritos })),
 );
 
+const SobreNos = lazy(() =>
+  import("./pages/SobreNos").then((module) => ({ default: module.SobreNos })),
+);
+
 const Login = lazy(() =>
   import("./pages/Login").then((module) => ({ default: module.Login })),
 );
@@ -77,6 +81,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/imovel/:id" element={<Detalhes />} />
           <Route path="/favoritos" element={<Favoritos />} />
+          <Route path="/sobre-nos" element={<SobreNos />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/perfil" element={<Perfil />} />

@@ -1,4 +1,4 @@
-import { Home as HomeIcon, Instagram } from "lucide-react";
+import {  Instagram } from "lucide-react";
 import { WhatsAppButton } from "./WhatsAppButton";
 import "../css/App.css"; // Ensure styles are available
 
@@ -8,7 +8,7 @@ export const Footer = () => {
       <div className="container footer-grid">
         <div>
           <h3 className="footer-brand">
-            <HomeIcon /> Lidiany Lopes Corretora
+          Lidiany Lopes & Moria Imóveis
           </h3>
           <p className="footer-text">
             Realizando sonhos e conectando pessoas aos seus lares ideais em
@@ -69,11 +69,11 @@ export const Footer = () => {
         </div>
 
         <div>
-          <h4 className="footer-heading">Segurança</h4>
-          <p>CRECI-MA: 922-J</p>
-          <p>CRECI-MA: F4632</p>
+          <h4 className="footer-heading">Segurança Jurídica</h4>
+          <p>Moria Imóveis | CRECI-MA: 922-J</p>
+          <p>Lidiany Lopes | CRECI-MA: F4632</p>
           <p className="footer-rights">
-            © 2026 Lidiany Lopes Corretora.
+            © 2026 Lidiany Lopes & Moria Imóveis.
             <br />
             Todos os direitos reservados.
           </p>

@@ -105,8 +105,24 @@ export const Perfil = () => {
                 </div>
               </div>
 
-              {/* Card Configurações (exemplo futuro) */}
-              
+               {/* Card Admin (Visível Apenas para Admin) */}
+              {isAdmin && (
+                <div 
+                  onClick={() => navigate("/admin")}
+                  className="perfil-action-card"
+                  style={{ borderColor: 'var(--accent-color)' }}
+                >
+                  <div className="perfil-action-icon icon-settings" style={{ backgroundColor: '#fefbed', color: 'var(--accent-color)' }}>
+                    <Shield size={24} />
+                  </div>
+                  <div className="perfil-action-info">
+                    <h3 style={{ color: 'var(--accent-color)' }}>Painel Admin</h3>
+                    <p>
+                      Gerenciar imóveis e terrenos do site
+                    </p>
+                  </div>
+                </div>
+              )}
 
             </div>
 

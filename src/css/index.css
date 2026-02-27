@@ -27,8 +27,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background-color: var(--bg-page);
-  color: var(--text-main);
+background-color: #f4f8f5; /* quase branco, levíssimo esverdeado */  color: var(--text-main);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -72,12 +71,14 @@ nav { display: flex; gap: 0.5rem; }
 
 /* --- HERO --- */
 .hero {
-  background: linear-gradient(to bottom, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.5)), 
-              url('https://images.unsplash.com/photo-1600596542815-2a429b08e6b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
-  background-size: cover; background-position: center;
-  height: 320px; display: flex; align-items: center; justify-content: center;
-  text-align: center; color: white; margin-bottom: 2rem;
-  border-bottom: 4px solid var(--primary);
+  background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)),
+              url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+  color: #f8fafc;
+  padding: 6rem 0;
+  text-align: center;
+  margin-bottom: 3rem; /* Espaço adicionado abaixo do hero para afastar os cards */
 }
 .hero-content { margin-top: -2rem; }
 .hero-content h1 { font-size: 2.8rem; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
@@ -132,8 +133,9 @@ form section h3 {
 
 /* --- GRID & CARDS --- */
 .imoveis-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
   gap: 2rem; padding-bottom: 4rem;
+  padding: 1rem;
 }
 
 .card {
@@ -147,11 +149,17 @@ form section h3 {
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
   border-color: var(--primary); /* Borda azul no hover */
-  border-width: 1px; /* Mantém fina para elegância */
+  border-width: 2px; /* Mantém fina para elegância */
+  
 }
 
-.card-img-wrapper { height: 280px; position: relative; background: var(--bg-page); border-bottom: 1px solid var(--input-border); }
+.card-img-wrapper { height: 450px; position: relative; background: var(--bg-page); border-bottom: 1px solid var(--input-border); }
 .card-img { width: 100%; height: 100%; object-fit: cover; }
+.card-img:hover {
+  border-width: 2px;
+}
+
+
 
 .badge-type {
   position: absolute; top: 12px; left: 12px;
@@ -159,6 +167,7 @@ form section h3 {
   padding: 6px 12px; border-radius: 6px;
   font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
   border: 1px solid rgba(255,255,255,0.3);
+  
 }
 
 .btn-fav {
@@ -221,6 +230,7 @@ form section h3 {
   .imoveis-grid {
     grid-template-columns: 1fr; /* Uma coluna só */
     gap: 1.5rem;
+    
   }
 
   /* 4. Menu de Navegação Horizontal no Celular (Estilo App) */

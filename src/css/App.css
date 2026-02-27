@@ -1,3 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --bg-color: #082119;
+  --bg-transparent: rgba(8, 33, 25, 0.9);
+  --accent-color: #D4AF37;
+  --accent-hover: #B5952F;
+  --text-color: #FFFFFF;
+  --subtext-color: #A0B5AC;
+  
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Montserrat', sans-serif;
+}
+
 /* src/css/App.css */
 /* 1. ISSO IMPEDE A TELA DE "DANÇAR" PARA OS LADOS */
 html, body {
@@ -10,6 +24,7 @@ html, body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-top: 96px; /* Adicionado para compensar o header fixo */
 }
 
 .container {
@@ -19,131 +34,260 @@ html, body {
   width: 100%;
 }
 
-/* --- Header --- */
+/* --- ESTILOS DO NOVO CABEÇALHO --- */
 .header {
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  box-shadow: var(--shadow-sm);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+    background-color: var(--bg-transparent);
+    padding: 24px 0;
+    transition: all 0.3s ease;
+    font-family: var(--font-sans);
 }
 
-.header-content {
-  height: 4.5rem; /* 72px */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.header.scrolled {
+    background-color: var(--bg-color);
+    padding: 12px 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+.header .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* --- LOGÓTIPO --- */
 .logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.3s ease;
+    text-decoration: none;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.logo-icon {
+    width: 48px;
+    height: 24px;
+    stroke: var(--accent-color);
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.logo-text-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-title {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: 0.025em;
+    color: var(--text-color);
+}
+
+.logo-subtitle {
+    font-family: var(--font-sans);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    margin-top: 4px;
+    color: var(--subtext-color);
+}
+
+/* --- NAVEGAÇÃO DESKTOP --- */
+.nav-desktop {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .nav-link {
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-left: 1.5rem;
-  transition: color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  text-decoration: none;
-  font-size: 18px;
-}
-
-.nav-link:hover {
-  color: var(--primary);
-}
-/* --- Estilos do Menu Mobile --- */
-
-/* Esconde o botão hambúrguer no Desktop */
-.mobile-menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #1e293b;
-  z-index: 1001; /* Fica acima de tudo */
-}
-
-/* Estilo padrão da navegação (Desktop) */
-.nav-menu {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-/* Estilo para Telas Pequenas (Mobile) */
-@media (max-width: 768px) {
-  
-  /* Mostra o botão hambúrguer */
-  .mobile-menu-btn {
-    display: block;
-    font-size: 1.5rem;
-  }
-
-  /* Transforma o menu em uma gaveta lateral */
-  .nav-menu {
-    position: fixed;
-    top: 0;
-    right: -100%; /* Começa escondido na direita */
-    width: 75%;   /* Ocupa 75% da tela */
-    height: 100vh;
-    background-color: var(--bg-card);
-    flex-direction: column; /* Itens um embaixo do outro */
-    justify-content: center;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    display: flex;
     align-items: center;
-    gap: 2rem;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-    transition: right 0.3s ease-in-out; /* Animação suave */
-    z-index: 1000;
-  }
+    gap: 4px;
+    color: inherit;
+}
 
-  /* Quando a classe .active é adicionada (pelo React), o menu entra na tela */
-  .nav-menu.active {
-    right: 0;
-  }
+.nav-link.active,
+.nav-link:hover {
+    color: var(--accent-color);
+}
 
-  /* Aumenta os links para facilitar o toque */
-  .nav-link {
-    font-size: 1.2rem;
-    width: 100%;
-    text-align: center;
-    padding: 10px 0;
-  }
+.fav-count {
+  background: var(--danger, #ef4444);
+  color: #fff;
+  font-size: 0.70rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  margin-left: 4px;
+}
 
-  /* Destaque para o botão sair no mobile */
-  .btn-logout {
-    justify-content: center;
-    width: auto;
+/* --- CONTACTO DESKTOP --- */
+.contact-desktop {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
 
-  }
+.contact-info {
+    text-align: right;
+    display: none; /* Oculto em ecrãs muito pequenos */
+}
 
-  /* Fundo escuro atrás do menu */
-  .menu-overlay {
+.contact-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--subtext-color);
+    margin-bottom: 0px !important;
+}
+
+.contact-number {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+    letter-spacing: 0.025em;
+    margin-bottom: 0px !important;
+}
+
+.btn-whatsapp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+}
+
+.btn-whatsapp:hover {
+    background-color: var(--accent-hover);
+    transform: scale(1.05);
+}
+
+.btn-whatsapp svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* --- MENU MOBILE (BOTÃO) --- */
+.btn-mobile-toggle {
+    display: none; /* Oculto em desktop */
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 8px;
+}
+
+/* --- OVERLAY DO MENU MOBILE --- */
+.mobile-menu-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-  }
+    background-color: var(--bg-color);
+    z-index: 2100; /* Acima do header normal */
+    display: flex;
+    flex-direction: column;
+    padding: 96px 24px 24px 24px;
+    transform: translateY(-100%); /* Escondido por cima por padrão */
+    transition: transform 0.4s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+    overflow-y: auto;
+    font-family: var(--font-sans);
 }
 
-.fav-count {
-  background: var(--danger);
-  color: rgb(0, 0, 0);
-  font-size: 0.75rem;
-  padding: 0.1rem 0.4rem;
-  border-radius: 999px;
-  margin-left: 4px;
+.mobile-menu-overlay.open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.btn-mobile-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.mobile-link {
+    font-size: 20px;
+    color: var(--text-color);
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: color 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mobile-link:hover {
+    color: var(--accent-color);
+}
+
+.mobile-btn-whatsapp {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    border-radius: 2px;
+    font-weight: 700;
+    font-size: 18px;
+    text-decoration: none;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 992px) {
+    .nav-desktop,
+    .contact-desktop {
+        display: none;
+    }
+
+    .btn-mobile-toggle {
+        display: block;
+    }
+}
+
+@media (min-width: 993px) {
+    .contact-info {
+        display: block;
+    }
 }
 
 /* --- Hero Section (Home) --- */
@@ -155,7 +299,7 @@ html, body {
   color: #f8fafc;
   padding: 6rem 0;
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 0; /* No space below hero so cards climb up directly */
 }
 
 .hero h1 {
@@ -170,33 +314,6 @@ html, body {
   color: #e2e8f0;
   max-width: 600px;
   margin: 0 auto;
-}
-
-/* --- Filtros --- */
-.filter-bar {
-  background: var(--surface);
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-md);
-  display: flex;
-  gap: 1rem;
-  margin-top: -3rem; /* Efeito de sobreposição no Hero */
-  margin-bottom: 3rem;
-  flex-wrap: wrap;
-  border: 1px solid var(--border);
-}
-
-.filter-group {
-  flex: 1;
-  min-width: 200px;
-}
-
-.filter-group label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--text-main);
 }
 
 /* --- Grid de Imóveis --- */
@@ -507,10 +624,11 @@ textarea.input-control {
   
 /* --- Footer --- */
 .footer {
-  background: #1e293b;
-  color: #94a3b8;
+  background: var(--bg-color); /* Same dark green as header */
+  color: var(--subtext-color); /* Matches header subtitle color */
   padding: 3rem 1rem;
   margin-top: auto;
+  font-family: var(--font-sans);
 }
 
 .footer-grid {
@@ -520,7 +638,10 @@ textarea.input-control {
 }
 
 .footer-brand {
-  color: white;
+  color: var(--text-color);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 23px;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -537,7 +658,10 @@ textarea.input-control {
 }
 
 .footer-heading {
-  color: white;
+  color: var(--text-color);
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
   margin-bottom: 1.5rem;
 }
 
@@ -553,7 +677,7 @@ textarea.input-control {
 
 .footer-email-container {
   margin-top: 1.5rem;
-  border-top: 1px solid #334155;
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border for dark background */
   padding-top: 1rem;
 }
 
@@ -562,7 +686,7 @@ textarea.input-control {
   align-items: center;
   gap: 10px;
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: var(--subtext-color);
 }
 
 .footer-rights {
