@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
+import { WHATSAPP_DEFAULT_MESSAGE } from '../constants';
 
 interface WhatsAppContextType {
   message: string;
@@ -9,10 +10,8 @@ interface WhatsAppContextType {
 const WhatsAppContext = createContext<WhatsAppContextType | undefined>(undefined);
 
 export const WhatsAppProvider = ({ children }: { children: ReactNode }) => {
-  const defaultMessage = "Olá! Vi um imóvel no site e gostaria de mais informações.";
-  const [message, setMessage] = useState(defaultMessage);
-
-  const resetMessage = () => setMessage(defaultMessage);
+  const [message, setMessage] = useState(WHATSAPP_DEFAULT_MESSAGE);
+  const resetMessage = () => setMessage(WHATSAPP_DEFAULT_MESSAGE);
 
   return (
     <WhatsAppContext.Provider value={{ message, setMessage, resetMessage }}>

@@ -1,10 +1,11 @@
 // src/components/WhatsAppButton.tsx
 import { useWhatsApp } from "../contexts/WhatsAppContext";
+import { WHATSAPP_NUMBER } from "../constants";
 
 export const WhatsAppButton = () => {
   const { message } = useWhatsApp();
   // Seu número formatado (DDI + DDD + Número)
-  const phoneNumber = "5599991243054"; 
+  const phoneNumber = WHATSAPP_NUMBER;
   const encodedMessage = encodeURIComponent(message);
 
   return (

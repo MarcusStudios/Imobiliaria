@@ -1,90 +1,111 @@
 // src/contexts/FavoritosContext.tsx
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { db } from '../services/firebaseConfig';
-import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useImoveis } from '../hooks/useImoveis';
 
 // Importando o tipo do arquivo separado
 import { type Imovel } from '../types';
 
 interface FavoritosContextData {
-  favoritos: Imovel[];
-  toggleFavorito: (imovel: Imovel) => Promise<void>;
+  favoritos: Imovel[];        // Lista completa e atualizada dos imóveis favoritados
+  favoritosIds: string[];     // Apenas os IDs (para verificações rápidas)
+  toggleFavorito: (id: string) => Promise<void>;
   isFavorito: (id: string) => boolean;
   count: number;
 }
 
 const FavoritosContext = createContext<FavoritosContextData>({} as FavoritosContextData);
 
-export const FavoritosProvider = ({ children }: { children: ReactNode }) => {
-  const [favoritos, setFavoritos] = useState<Imovel[]>([]);
-  const { user } = useAuth();
+const STORAGE_KEY = '@lidiany:favoritos-ids';
 
-  // Efeito para carregar os dados
+export const FavoritosProvider = ({ children }: { children: ReactNode }) => {
+  const [favoritosIds, setFavoritosIds] = useState<string[]>([]);
+  const { user } = useAuth();
+  const { data: todosImoveis = [] } = useImoveis();
+
+  // Efeito para carregar os IDs salvos
   useEffect(() => {
     const carregarFavoritos = async () => {
       if (user) {
-        // Lógica logado (Firebase)
+        // Lógica logado (Firebase): salva/carrega apenas IDs
         try {
           const docRef = doc(db, "users", user.uid);
           const docSnap = await getDoc(docRef);
-          if (docSnap.exists() && docSnap.data().favoritos) {
-            setFavoritos(docSnap.data().favoritos);
+          if (docSnap.exists() && docSnap.data().favoritosIds) {
+            setFavoritosIds(docSnap.data().favoritosIds as string[]);
+          } else if (docSnap.exists() && docSnap.data().favoritos) {
+            // Migração: converte objetos antigos para IDs
+            const ids = (docSnap.data().favoritos as Imovel[]).map(i => i.id);
+            setFavoritosIds(ids);
+            await setDoc(docRef, { favoritosIds: ids }, { merge: true });
           } else {
-            setFavoritos([]);
+            setFavoritosIds([]);
           }
         } catch (error) {
           console.error("Erro ao buscar favoritos:", error);
         }
       } else {
-        // Lógica deslogado (LocalStorage)
-        const localData = localStorage.getItem('@lidiany:favoritos');
+        // Lógica deslogado (LocalStorage): salva/carrega apenas IDs
+        const localData = localStorage.getItem(STORAGE_KEY);
+        // Migração: suporte ao formato antigo (array de objetos)
         if (localData) {
-          setFavoritos(JSON.parse(localData));
+          try {
+            const parsed = JSON.parse(localData);
+            if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
+              // Formato antigo: array de objetos Imovel
+              const ids = parsed.map((i: Imovel) => i.id);
+              setFavoritosIds(ids);
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+            } else {
+              setFavoritosIds(parsed);
+            }
+          } catch {
+            setFavoritosIds([]);
+          }
         } else {
-          setFavoritos([]);
+          setFavoritosIds([]);
         }
       }
     };
     carregarFavoritos();
   }, [user]);
 
-  // Função para Favoritar/Desfavoritar
-  const toggleFavorito = async (imovel: Imovel) => {
-    const jaExiste = favoritos.some(item => item.id === imovel.id);
-    let novaLista;
+  // Resolve os objetos Imovel completos e atualizados a partir dos IDs
+  const favoritos = useMemo(() => {
+    return todosImoveis.filter(imovel => favoritosIds.includes(imovel.id));
+  }, [todosImoveis, favoritosIds]);
 
-    if (jaExiste) {
-      novaLista = favoritos.filter(item => item.id !== imovel.id);
-    } else {
-      novaLista = [...favoritos, imovel];
-    }
+  // Função para Favoritar/Desfavoritar (agora só gerencia IDs)
+  const toggleFavorito = async (id: string) => {
+    const jaExiste = favoritosIds.includes(id);
+    const novosIds = jaExiste
+      ? favoritosIds.filter(fid => fid !== id)
+      : [...favoritosIds, id];
 
     // Atualiza visualmente na hora
-    setFavoritos(novaLista);
+    setFavoritosIds(novosIds);
 
     // Salva no banco ou local
     if (user) {
       try {
         const userRef = doc(db, "users", user.uid);
-        if (jaExiste) {
-          await updateDoc(userRef, { favoritos: arrayRemove(imovel) });
-        } else {
-          // setDoc com merge garante que cria o doc se não existir
-          await setDoc(userRef, { favoritos: arrayUnion(imovel) }, { merge: true });
-        }
+        await setDoc(userRef, { favoritosIds: novosIds }, { merge: true });
       } catch (error) {
-        console.error("Erro ao sincronizar:", error);
+        console.error("Erro ao sincronizar favoritos:", error);
+        // Revert em caso de erro
+        setFavoritosIds(favoritosIds);
       }
     } else {
-      localStorage.setItem('@lidiany:favoritos', JSON.stringify(novaLista));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(novosIds));
     }
   };
 
-  const isFavorito = (id: string) => favoritos.some(item => item.id === id);
+  const isFavorito = (id: string) => favoritosIds.includes(id);
 
   return (
-    <FavoritosContext.Provider value={{ favoritos, toggleFavorito, isFavorito, count: favoritos.length }}>
+    <FavoritosContext.Provider value={{ favoritos, favoritosIds, toggleFavorito, isFavorito, count: favoritosIds.length }}>
       {children}
     </FavoritosContext.Provider>
   );

@@ -101,7 +101,7 @@ describe('ImovelCard Component', () => {
     
     fireEvent.click(botaoFav);
 
-    // O mock do toggleFavorito precisa ter sido chamado com o objeto do imóvel
-    expect(mockToggleFavorito).toHaveBeenCalledWith(mockImovel);
+    // O mock do toggleFavorito precisa ter sido chamado com o ID do imóvel
+    expect(mockToggleFavorito).toHaveBeenCalledWith('1');
   });
 });

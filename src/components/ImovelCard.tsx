@@ -91,7 +91,7 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            toggleFavorito(imovel);
+            toggleFavorito(imovel.id);
           }}
           aria-label={isFav ? `Remover ${imovel.titulo} dos favoritos` : `Adicionar ${imovel.titulo} aos favoritos`}
           title={isFav ? "Remover dos favoritos" : "Adicionar aos favoritos"}

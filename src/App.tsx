@@ -7,6 +7,7 @@ import "./css/App.css";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { RotaPrivada } from "./components/RotaPrivada";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Home } from "./pages/Home";
 
 // Imports com Lazy Loading (Carregamento sob demanda)
@@ -83,7 +84,8 @@ function App() {
     <div className="app">
       <Header />
 
-      <Suspense fallback={<Loading />}>
+      <ErrorBoundary>
+        <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/imovel/:id" element={<Detalhes />} />
@@ -146,7 +148,8 @@ function App() {
           <Route path="*" element={<NaoEncontrado />} />
 
         </Routes>
-      </Suspense>
+        </Suspense>
+      </ErrorBoundary>
 
       <Footer />
     </div>
