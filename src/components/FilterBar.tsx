@@ -81,12 +81,20 @@ export const FilterBar = ({ filtros, setFiltros, ordem, setOrdem, onClear }: Fil
 
       {/* Row 2: Search Input */}
       <div className="filter-bar__row-search">
+        <label
+          htmlFor="filter-busca"
+          className="sr-only"
+        >
+          Localização ou Nome
+        </label>
         <input
+          id="filter-busca"
           type="text"
           placeholder="palavra-chave"
           value={filtros.busca}
           onChange={(e) => update("busca", e.target.value)}
           className="filter-bar__search-input-field"
+          aria-label="Localização ou Nome"
         />
       </div>
 

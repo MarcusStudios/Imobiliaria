@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   Bed,
@@ -13,7 +13,7 @@ import {
   CalendarCheck,
   Share2,
 } from "lucide-react";
-import { doc, getDoc, collection, getDocs, query, where, limit, updateDoc, increment } from "firebase/firestore";
+import { doc, updateDoc, increment } from "firebase/firestore";
 import { db } from "../services/firebaseConfig";
 import { ImageGallery } from "../components/ImageGallery";
 import { PriceCard } from "../components/PriceCard";
@@ -21,68 +21,55 @@ import { ImovelCard } from "../components/ImovelCard";
 import type { Imovel, FirebaseTimestamp } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import { useSEO } from "../hooks/useSEO";
+import { useImovelDetalhes } from "../hooks/useImovelDetalhes";
+import { useImoveis } from "../hooks/useImoveis";
 import "../css/Detalhes.css";
 
 export const Detalhes = () => {
   const { id } = useParams<{ id: string }>();
-  const [imovel, setImovel] = useState<Imovel | null>(null);
-  useSEO({
-    title: imovel ? `${imovel.titulo} - ${imovel.cidade}` : 'Carregando imóvel...',
-    description: imovel ? `${imovel.tipo} em ${imovel.bairro}, ${imovel.cidade}. ${imovel.quartos} quartos, ${imovel.area}m². Lidiany Lopes - Moriá Imóveis.` : undefined,
-  });
-  const [relacionados, setRelacionados] = useState<Imovel[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
   const { isAdmin } = useAuth();
 
+  // Busca o imóvel via cache do React Query (não faz fetch desnecessário)
+  const { data: imovel, isLoading: loading } = useImovelDetalhes(id);
+
+  // Busca a lista completa do cache (já carregada pela Home, sem novo fetch)
+  const { data: todosImoveis = [] } = useImoveis();
+
+  // Deriva os imóveis relacionados diretamente do cache da lista
+  const relacionados = useMemo<Imovel[]>(() => {
+    if (!imovel || todosImoveis.length === 0) return [];
+    return todosImoveis
+      .filter(
+        (i) =>
+          i.id !== id &&
+          i.ativo !== false &&
+          i.tipo === imovel.tipo &&
+          i.categoria === imovel.categoria
+      )
+      .slice(0, 4);
+  }, [imovel, todosImoveis, id]);
+
+  useSEO({
+    title: imovel ? `${imovel.titulo} - ${imovel.cidade}` : "Carregando imóvel...",
+    description: imovel
+      ? `${imovel.tipo} em ${imovel.bairro}, ${imovel.cidade}. ${imovel.quartos} quartos, ${imovel.area}m². Lidiany Lopes - Moriá Imóveis.`
+      : undefined,
+  });
+
+  const [copied, setCopied] = useState(false);
+
+  // Rolar para o topo ao mudar de imóvel
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchImovel = async () => {
-      if (!id) return;
-      setLoading(true);
-      try {
-        const docSnap = await getDoc(doc(db, "imoveis", id));
-        if (docSnap.exists()) {
-          const dados = { id: docSnap.id, ...docSnap.data() } as Imovel;
-          setImovel(dados);
-          
-          // Incrementar visualizações caso não seja um admin
-          console.log(`[Viewer] Administrador logado: ${isAdmin}`);
-          if (!isAdmin) {
-            console.log(`[Viewer] Incrementando visualização para o imóvel: ${id}`);
-            updateDoc(doc(db, "imoveis", id), {
-              visualizacoes: increment(1)
-            })
-            .then(() => console.log("[Viewer] Visualização registrada com sucesso no Firebase!"))
-            .catch(err => console.error("[Viewer] Erro ao registrar visualização:", err));
-          } else {
-            console.log("[Viewer] Visualização ignorada: Usuários administradores não contam nas estatísticas.");
-          }
-          
-          // Buscar imóveis relacionados (mesmo tipo e categoria)
-          const q = query(
-            collection(db, "imoveis"),
-            where("tipo", "==", dados.tipo),
-            where("ativo", "==", true),
-            limit(5) // Busca 5 para garantir 4 caso o atual esteja no meio
-          );
-          
-          const relSnap = await getDocs(q);
-          const relData = relSnap.docs
-            .map(d => ({ id: d.id, ...d.data() } as Imovel))
-            .filter(i => i.id !== id && i.categoria === dados.categoria)
-            .slice(0, 4); // Pega maximo 4
-            
-          setRelacionados(relData);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchImovel();
-  }, [id, isAdmin]);
+  }, [id]);
+
+  // Incrementar visualizações (side-effect isolado, não interfere no cache)
+  useEffect(() => {
+    if (!id || !imovel || isAdmin) return;
+    updateDoc(doc(db, "imoveis", id), {
+      visualizacoes: increment(1),
+    }).catch((err) => console.error("Erro ao registrar visualização:", err));
+  }, [id, imovel, isAdmin]);
 
   if (loading)
     return (
@@ -99,7 +86,7 @@ export const Detalhes = () => {
 
   const formatarData = (timestamp: FirebaseTimestamp | Date | null | undefined) => {
     if (!timestamp) return "";
-    const date = 'toDate' in timestamp ? timestamp.toDate() : timestamp;
+    const date = "toDate" in timestamp ? timestamp.toDate() : timestamp;
     return new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(date);
   };
 
@@ -122,7 +109,7 @@ export const Detalhes = () => {
   const handleShare = async () => {
     const url = window.location.href;
     const title = imovel.titulo || "Confira este imóvel";
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -147,16 +134,24 @@ export const Detalhes = () => {
     <div className="detalhes-page">
       {/* CABEÇALHO */}
       <div className="container detalhes-header-container">
-        
+
         <div className="detalhes-nav-bar">
           <Link to="/" className="detalhes-back-link">
             <ArrowLeft size={20} /> Voltar
           </Link>
           <div className="detalhes-actions">
-            <button 
-              className="btn-share" 
+            <button
+              className="btn-share"
               onClick={handleShare}
-              style={copied ? { color: 'var(--success)', borderColor: 'var(--success)', backgroundColor: '#f0fdf4' } : {}}
+              style={
+                copied
+                  ? {
+                      color: "var(--success)",
+                      borderColor: "var(--success)",
+                      backgroundColor: "#f0fdf4",
+                    }
+                  : {}
+              }
             >
               {copied ? (
                 <><CheckCircle2 size={16} /> Copiado!</>
@@ -223,7 +218,7 @@ export const Detalhes = () => {
       <div className="container details-layout">
         {/* COLUNA DA ESQUERDA */}
         <div className="details-column-left">
-          <ImageGallery images={imagens} />
+          <ImageGallery images={imagens} altBase={imovel.titulo} />
 
           {/* Card de Preço SÓ PARA CELULAR */}
           <div className="mobile-price-container">
@@ -290,13 +285,27 @@ export const Detalhes = () => {
 
       {/* SEÇÃO DE IMÓVEIS RELACIONADOS */}
       {relacionados.length > 0 && (
-        <div style={{ backgroundColor: 'var(--bg-page)', padding: '4rem 0', marginTop: '4rem', borderTop: '1px solid #e2e8f0' }}>
+        <div
+          style={{
+            backgroundColor: "var(--bg-page)",
+            padding: "4rem 0",
+            marginTop: "4rem",
+            borderTop: "1px solid #e2e8f0",
+          }}
+        >
           <div className="container">
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '2rem', color: 'var(--text-main)' }}>
+            <h2
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: 800,
+                marginBottom: "2rem",
+                color: "var(--text-main)",
+              }}
+            >
               Você também pode se interessar
             </h2>
             <div className="imoveis-grid">
-              {relacionados.map(rel => (
+              {relacionados.map((rel) => (
                 <ImovelCard key={rel.id} imovel={rel} />
               ))}
             </div>

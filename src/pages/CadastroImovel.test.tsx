@@ -33,8 +33,27 @@ vi.mock('../services/cloudinaryService', () => ({
   optimizeCloudinaryUrl: (url: string) => url,
 }));
 
+// 4. Mock do ToastContext (adicionado ao componente após os testes originais)
+vi.mock('../contexts/ToastContext', () => ({
+  useToast: () => ({
+    showToast: vi.fn(),
+  }),
+}));
+
+// 5. Mock do React Query (useQueryClient adicionado ao componente após os testes originais)
+vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: () => ({
+    invalidateQueries: vi.fn(),
+  }),
+}));
+
+vi.mock('../hooks/useImoveis', () => ({
+  IMOVEIS_QUERY_KEY: ['imoveis'],
+}));
+
 // Como a função scrollTo é chamada no window, precisamos mockar ela também
 window.scrollTo = vi.fn();
+
 
 describe('CadastroImovel Component', () => {
   it('deve renderizar a página de novo cadastro corretamente', () => {

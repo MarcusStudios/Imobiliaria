@@ -5,12 +5,17 @@ service cloud.firestore {
     // --- REGRAS PARA IMÓVEIS ---
     // Leitura: Pública (Todo mundo vê o site)
     // Escrita: Restrita (Só o seu UID de Admin pode alterar)
-    match /imoveis/{document=**} {
+    match /imoveis/{imovelId} {
+      // Leitura pública
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == "UG2t4JLe6WgzQShgaBP83EfXgfy1";
-      // Permite que qualquer pessoa incremente as visualizações em +1
+
+      // Qualquer visitante pode incrementar SOMENTE o campo visualizacoes em +1
       allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visualizacoes'])
+                    && request.resource.data.visualizacoes is int
                     && request.resource.data.visualizacoes == resource.data.get('visualizacoes', 0) + 1;
+
+      // Admin pode fazer qualquer escrita (create, update, delete)
+      allow write: if request.auth != null && request.auth.uid == "UG2t4JLe6WgzQShgaBP83EfXgfy1";
     }
 
     // --- REGRAS PARA USUÁRIOS (Favoritos) ---

@@ -30,6 +30,7 @@ export const Footer = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link footer-contact-link"
+            aria-label="Falar via WhatsApp: (99) 99124-3054"
             style={{ color: "white" }} 
             onMouseOver={(e) => (e.currentTarget.style.color = "#25D366")}
             onMouseOut={(e) => (e.currentTarget.style.color = "white")}
@@ -52,6 +53,7 @@ export const Footer = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link footer-contact-link"
+            aria-label="Visitar Instagram @moriaimoveis10"
             style={{ color: "white" }}
             onMouseOver={(e) => (e.currentTarget.style.color = "#E1306C")}
             onMouseOut={(e) => (e.currentTarget.style.color = "white")}

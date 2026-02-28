@@ -26,6 +26,20 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Acessibilidade: esconde visualmente mas mantém para leitores de tela */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+
 body {
 background-color: #f4f8f5; /* quase branco, levíssimo esverdeado */  color: var(--text-main);
   font-family: 'Inter', system-ui, sans-serif;
@@ -102,6 +116,21 @@ nav { display: flex; gap: 0.5rem; }
   border-color: var(--input-focus); /* Fica azul forte */
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); /* Anel externo azul */
 }
+
+/* ===================================================
+   ACESSIBILIDADE — Foco visível para navegação por teclado
+   Aparece apenas com teclado (não interfere com mouse)
+   =================================================== */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 
 label.label {
   display: block; font-size: 0.85rem; font-weight: 700;

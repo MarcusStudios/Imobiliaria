@@ -1,22 +1,25 @@
 // src/pages/Home.tsx
 import { useState, useEffect, useMemo } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../services/firebaseConfig";
 import { useLocation } from "react-router-dom";
 import { ImovelCard } from "../components/ImovelCard";
 import { FilterBar } from "../components/FilterBar";
-import type { Imovel } from "../types";
 import { useSEO } from "../hooks/useSEO";
+import { useImoveis } from "../hooks/useImoveis";
 import "../css/Home.css";
 
 const ITEMS_PER_PAGE = 12;
 
 export const Home = () => {
   useSEO({ title: 'Imóveis em Açailândia', description: 'Encontre casas, apartamentos e terrenos para compra e aluguel em Açailândia e região. Lidiany Lopes - Moriá Imóveis.' });
-  const [listaImoveis, setListaImoveis] = useState<Imovel[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const { data: todosImoveis, isLoading: loading } = useImoveis();
   const location = useLocation();
+
+  const listaImoveis = useMemo(() => {
+    if (!todosImoveis) return [];
+    return todosImoveis.filter((imovel) => imovel.ativo !== false);
+  }, [todosImoveis]);
+
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   // Estado dos filtros
   const [filtros, setFiltros] = useState({
@@ -34,35 +37,17 @@ export const Home = () => {
   useEffect(() => {
     const state = location.state as { filtroTipo?: string } | null;
     if (state?.filtroTipo) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFiltros(prev => ({ ...prev, tipo: state.filtroTipo! }));
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
 
-  // Busca todos os imóveis do Firebase
-  useEffect(() => {
-    const fetchImoveis = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "imoveis"));
-        const data = querySnapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }) as Imovel)
-          .filter((imovel) => imovel.ativo !== false);
-
-        setListaImoveis(data);
-      } catch (error) {
-        console.error("Erro ao buscar imóveis:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchImoveis();
-  }, []);
+  // (Fetch substituído pelo React Query no topo do arquivo)
 
   // Resetar visibleCount quando filtros mudam
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisibleCount(ITEMS_PER_PAGE);
   }, [filtros, ordem]);
 

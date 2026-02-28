@@ -1,18 +1,18 @@
 // src/pages/Admin.tsx
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { db } from '../services/firebaseConfig';
-import { 
-  collection, 
-  getDocs, 
-  deleteDoc, 
-  doc, 
-  updateDoc 
+import {
+  deleteDoc,
+  doc,
+  updateDoc
 } from 'firebase/firestore';
 import { DashboardStats } from '../components/DashboardStats';
 import { DashboardCharts } from '../components/DashboardCharts';
 import { AdminImovelList } from '../components/AdminImovelList';
 import { type Imovel } from '../types';
 import { useSEO } from '../hooks/useSEO';
+import { useImoveis, IMOVEIS_QUERY_KEY } from '../hooks/useImoveis';
+import { useQueryClient } from '@tanstack/react-query';
 import '../css/Admin.css';
 
 interface Estatisticas {
@@ -29,31 +29,10 @@ interface Estatisticas {
 
 export const Admin = () => {
   useSEO({ title: 'Painel Administrativo', description: 'Dashboard de gerenciamento de imóveis.' });
-  const [imoveis, setImoveis] = useState<Imovel[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: imoveis = [], isLoading: loading } = useImoveis();
   const [filtro, setFiltro] = useState('todos'); // todos, venda, aluguel, rascunho
   const [busca, setBusca] = useState('');
-  
-  // Buscar imóveis
-  const fetchImoveis = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "imoveis"));
-      const lista = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Imovel[];
-      
-      setImoveis(lista);
-    } catch (error) {
-      console.error("Erro ao buscar imóveis:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchImoveis();
-  }, []);
 
   // Calcular Estatísticas (Memoized)
   const stats = useMemo((): Estatisticas => {
@@ -132,7 +111,9 @@ export const Admin = () => {
 
     try {
       await deleteDoc(doc(db, "imoveis", id));
-      setImoveis(prev => prev.filter(imovel => imovel.id !== id));
+      queryClient.setQueryData<Imovel[]>(IMOVEIS_QUERY_KEY, (old) => 
+        old ? old.filter(imovel => imovel.id !== id) : []
+      );
     } catch (error) {
       console.error("Erro ao excluir:", error);
       alert("Erro ao excluir.");
@@ -146,9 +127,9 @@ export const Admin = () => {
         ativo: novoStatus
       });
 
-      setImoveis(prev => prev.map(imovel => 
-        imovel.id === id ? { ...imovel, ativo: novoStatus } : imovel
-      ));
+      queryClient.setQueryData<Imovel[]>(IMOVEIS_QUERY_KEY, (old) => 
+        old ? old.map(imovel => imovel.id === id ? { ...imovel, ativo: novoStatus } : imovel) : []
+      );
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
     }

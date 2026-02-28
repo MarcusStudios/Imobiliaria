@@ -14,12 +14,15 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { IMOVEIS_QUERY_KEY } from '../hooks/useImoveis';
 import '../css/CadastroForm.css';
 
 export const CadastroTerreno = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -140,7 +143,7 @@ export const CadastroTerreno = () => {
       };
       carregarDados();
     }
-  }, [id, navigate]);
+  }, [id, navigate, showToast]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -260,12 +263,17 @@ export const CadastroTerreno = () => {
           ...dadosFinais,
           atualizadoEm: serverTimestamp(),
         });
+        // Invalida o cache do item individual e da lista
+        queryClient.invalidateQueries({ queryKey: ['imovel', id] });
+        queryClient.invalidateQueries({ queryKey: IMOVEIS_QUERY_KEY });
         showToast('Terreno atualizado com sucesso!', 'success');
       } else {
         await addDoc(collection(db, "imoveis"), {
           ...dadosFinais,
           criadoEm: serverTimestamp(),
         });
+        // Invalida o cache da lista para o novo terreno aparecer
+        queryClient.invalidateQueries({ queryKey: IMOVEIS_QUERY_KEY });
         showToast('Terreno cadastrado com sucesso!', 'success');
       }
       navigate('/admin');

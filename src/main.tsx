@@ -8,10 +8,14 @@ import { FavoritosProvider } from './contexts/FavoritosContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { WhatsAppProvider } from './contexts/WhatsAppContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
       <WhatsAppProvider>
         <FavoritosProvider>
           <ToastProvider>
@@ -23,5 +27,6 @@ createRoot(document.getElementById('root')!).render(
         </FavoritosProvider>
       </WhatsAppProvider>
     </AuthProvider>
+    </QueryClientProvider>
   </StrictMode>,
 );

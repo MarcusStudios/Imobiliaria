@@ -37,7 +37,16 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
   return (
     <div
       className="card"
+      role="article"
+      tabIndex={0}
+      aria-label={`Imóvel: ${imovel.titulo}`}
       onClick={() => navigate(`/imovel/${imovel.id}`)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigate(`/imovel/${imovel.id}`);
+        }
+      }}
     >
       <div className="card-img-wrapper">
         <img
@@ -84,9 +93,10 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
             e.stopPropagation();
             toggleFavorito(imovel);
           }}
+          aria-label={isFav ? `Remover ${imovel.titulo} dos favoritos` : `Adicionar ${imovel.titulo} aos favoritos`}
           title={isFav ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
-          <Heart size={18} fill={isFav ? "currentColor" : "none"} />
+          <Heart size={18} fill={isFav ? "currentColor" : "none"} aria-hidden="true" />
         </button>
       </div>
 
