@@ -2,14 +2,13 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react"; // <--- 1. Importando os ícones
+import { Eye, EyeOff } from "lucide-react";
+import "../css/Login.css";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  // 2. Estado para controlar se mostra ou esconde a senha
   const [showPassword, setShowPassword] = useState(false);
 
   const { login } = useAuth();
@@ -28,20 +27,19 @@ export const Login = () => {
   };
 
   return (
-    <div className="container" style={{ padding: "4rem 0", maxWidth: "400px" }}>
-      <div className="card" style={{ padding: "2rem" }}>
-        <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
+    <div className="container login-container">
+      <div className="card login-card">
+        <h2 className="login-title">
           Acesso Restrito
         </h2>
+        
         {error && (
-          <div
-            style={{ color: "red", marginBottom: "1rem", textAlign: "center" }}
-          >
+          <div className="login-error">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "1rem" }}>
+        <form onSubmit={handleSubmit} className="login-form">
           {/* CAMPO EMAIL */}
           <div>
             <label className="label">Email</label>
@@ -50,42 +48,28 @@ export const Login = () => {
               className="input-control"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="exemplo@email.com" // <--- Placeholder adicionado
+              placeholder="exemplo@email.com"
               required
             />
           </div>
 
-          {/* CAMPO SENHA COM O OLHO */}
+          {/* CAMPO SENHA */}
           <div>
             <label className="label">Senha</label>
-            <div style={{ position: "relative" }}>
-              {" "}
-              {/* Necessário para posicionar o ícone */}
+            <div className="login-input-wrapper">
               <input
-                // Alterna entre 'text' (visível) e 'password' (bolinhas)
                 type={showPassword ? "text" : "password"}
-                className="input-control"
+                className="input-control login-password-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Digite sua senha" // <--- Placeholder adicionado
-                style={{ paddingRight: "40px" }} // Espaço para o texto não ficar embaixo do ícone
+                placeholder="Digite sua senha"
                 required
               />
               <button
-                type="button" // IMPORTANTE: type="button" para não enviar o formulário ao clicar
+                type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "10px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "#64748b",
-                  display: "flex",
-                  alignItems: "center",
-                }}
+                className="login-toggle-password"
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -94,39 +78,25 @@ export const Login = () => {
 
           <button
             type="submit"
-            className="btn-details"
-            style={{ width: "100%", marginTop: "1rem" }}
+            className="btn-details login-submit-btn"
           >
             Entrar
           </button>
         </form>
 
-        <div
-          style={{
-            marginTop: "1.5rem",
-            textAlign: "center",
-            fontSize: "0.9rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.8rem",
-          }}
-        >
+        <div className="login-footer">
           <Link
             to="/recuperar-senha"
-            style={{ color: "#64748b", textDecoration: "none" }}
+            className="login-forgot-link"
           >
             Esqueceu a senha?
           </Link>
 
-          <div>
-            Não tem conta?{" "}
+          <div className="login-register-text">
+            Não tem conta?
             <Link
               to="/cadastro"
-              style={{
-                color: "var(--primary)",
-                fontWeight: "bold",
-                textDecoration: "none",
-              }}
+              className="login-register-link"
             >
               Cadastre-se
             </Link>
