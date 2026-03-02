@@ -108,6 +108,15 @@ html, body {
     color: var(--subtext-color);
 }
 
+.logo-creci {
+    font-family: var(--font-sans);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    margin-top: 2px;
+    color: var(--accent-color);
+    opacity: 0.8;
+}
+
 /* --- NAVEGAÇÃO DESKTOP --- */
 .nav-desktop {
     display: flex;
