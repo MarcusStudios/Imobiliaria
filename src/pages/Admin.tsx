@@ -9,6 +9,7 @@ import {
 import { DashboardStats } from '../components/DashboardStats';
 import { DashboardCharts } from '../components/DashboardCharts';
 import { AdminImovelList } from '../components/AdminImovelList';
+import { ConfirmModal } from '../components/ConfirmModal';
 import { type Imovel } from '../types';
 import { useSEO } from '../hooks/useSEO';
 import { useImoveis, IMOVEIS_QUERY_KEY } from '../hooks/useImoveis';
@@ -31,8 +32,9 @@ export const Admin = () => {
   useSEO({ title: 'Painel Administrativo', description: 'Dashboard de gerenciamento de imóveis.' });
   const queryClient = useQueryClient();
   const { data: imoveis = [], isLoading: loading } = useImoveis();
-  const [filtro, setFiltro] = useState('todos'); // todos, venda, aluguel, rascunho
+  const [filtro, setFiltro] = useState('todos');
   const [busca, setBusca] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   // Calcular Estatísticas (Memoized)
   const stats = useMemo((): Estatisticas => {
@@ -58,7 +60,7 @@ export const Admin = () => {
       emDestaque: imoveis.filter(i => i.destaque === true).length,
       valorMedioVenda: Math.round(
         imoveis.filter(i => i.tipo === 'Venda' || i.tipo === 'Ambos')
-          .reduce((acc, i) => acc + i.preco, 0) / 
+          .reduce((acc, i) => acc + i.preco, 0) /
         (imoveis.filter(i => i.tipo === 'Venda' || i.tipo === 'Ambos').length || 1)
       ),
     };
@@ -67,13 +69,11 @@ export const Admin = () => {
   // Filtrar imóveis (Memoized)
   const imoveisFiltrados = useMemo(() => {
     return imoveis.filter(imovel => {
-      // Filtro por tipo
       if (filtro === 'venda' && imovel.tipo !== 'Venda' && imovel.tipo !== 'Ambos') return false;
       if (filtro === 'aluguel' && imovel.tipo !== 'Aluguel' && imovel.tipo !== 'Ambos') return false;
       if (filtro === 'rascunho' && imovel.ativo !== false) return false;
       if (filtro === 'ativos' && imovel.ativo === false) return false;
-      
-      // Busca por texto
+
       if (busca) {
         const termos = busca.toLowerCase();
         return (
@@ -82,7 +82,7 @@ export const Admin = () => {
           (imovel.bairro && imovel.bairro.toLowerCase().includes(termos))
         );
       }
-      
+
       return true;
     });
   }, [imoveis, filtro, busca]);
@@ -105,29 +105,30 @@ export const Admin = () => {
     };
   }, [imoveis]);
 
-  const handleDelete = async (id: string) => {
-    const confirm = window.confirm("Tem certeza que deseja excluir? Essa ação é permanente.");
-    if (!confirm) return;
+  const handleDelete = (id: string) => {
+    setDeleteTarget(id);
+  };
 
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await deleteDoc(doc(db, "imoveis", id));
-      queryClient.setQueryData<Imovel[]>(IMOVEIS_QUERY_KEY, (old) => 
-        old ? old.filter(imovel => imovel.id !== id) : []
+      await deleteDoc(doc(db, "imoveis", deleteTarget));
+      queryClient.setQueryData<Imovel[]>(IMOVEIS_QUERY_KEY, (old) =>
+        old ? old.filter(imovel => imovel.id !== deleteTarget) : []
       );
     } catch (error) {
       console.error("Erro ao excluir:", error);
       alert("Erro ao excluir.");
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
   const handleToggleStatus = async (id: string, statusAtual: boolean) => {
     try {
       const novoStatus = !statusAtual;
-      await updateDoc(doc(db, "imoveis", id), {
-        ativo: novoStatus
-      });
-
-      queryClient.setQueryData<Imovel[]>(IMOVEIS_QUERY_KEY, (old) => 
+      await updateDoc(doc(db, "imoveis", id), { ativo: novoStatus });
+      queryClient.setQueryData<Imovel[]>(IMOVEIS_QUERY_KEY, (old) =>
         old ? old.map(imovel => imovel.id === id ? { ...imovel, ativo: novoStatus } : imovel) : []
       );
     } catch (error) {
@@ -136,28 +137,25 @@ export const Admin = () => {
   };
 
   if (loading) return (
-    <div className="loading-state">
-      Carregando painel...
-    </div>
+    <div className="loading-state">Carregando painel...</div>
   );
+
+  const deleteTargetImovel = imoveis.find(i => i.id === deleteTarget);
 
   return (
     <div className="admin-container">
-      {/* Header */}
       <div className="admin-header">
         <h2>📊 Dashboard Administrativo</h2>
         <p>Visão geral dos seus imóveis e estatísticas</p>
       </div>
 
-      {/* Stats Components */}
       <DashboardStats stats={stats} />
-      
-      <DashboardCharts 
-        faixasPreco={faixasPreco} 
-        maisVisualizados={maisVisualizados} 
+
+      <DashboardCharts
+        faixasPreco={faixasPreco}
+        maisVisualizados={maisVisualizados}
       />
 
-      {/* List Component */}
       <AdminImovelList
         imoveis={imoveisFiltrados}
         onDelete={handleDelete}
@@ -166,6 +164,21 @@ export const Admin = () => {
         setFiltro={setFiltro}
         busca={busca}
         setBusca={setBusca}
+      />
+
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        title="Excluir imóvel?"
+        message={
+          deleteTargetImovel
+            ? `Tem certeza que deseja excluir "${deleteTargetImovel.titulo}"? Essa ação é permanente e não pode ser desfeita.`
+            : "Tem certeza que deseja excluir este imóvel? Essa ação é permanente."
+        }
+        confirmLabel="Sim, excluir"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   );

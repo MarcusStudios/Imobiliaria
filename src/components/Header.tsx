@@ -30,6 +30,16 @@ export const Header = () => {
     document.body.style.overflow = '';
   };
 
+  // Fechar menu mobile com Escape
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMenu();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [isMenuOpen]);
+
   return (
     <>
       {/* CABEÇALHO PRINCIPAL */}
@@ -75,7 +85,13 @@ export const Header = () => {
           </div>
 
           {/* Botão Menu Mobile (Hamburguer) */}
-          <button className="btn-mobile-toggle" onClick={openMenu} aria-label="Abrir Menu">
+          <button
+            className="btn-mobile-toggle"
+            onClick={openMenu}
+            aria-label="Abrir Menu"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobileMenu"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
           </button>
 
@@ -83,7 +99,13 @@ export const Header = () => {
       </header>
 
       {/* MENU MOBILE (OVERLAY) */}
-      <div className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`} id="mobileMenu">
+      <div
+        className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`}
+        id="mobileMenu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu de navegação"
+      >
         {/* Botão Fechar Menu */}
         <button className="btn-mobile-close" onClick={closeMenu} aria-label="Fechar Menu">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>

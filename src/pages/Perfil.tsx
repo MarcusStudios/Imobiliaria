@@ -1,22 +1,26 @@
 // src/pages/Perfil.tsx
+import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useFavoritos } from "../contexts/FavoritosContext";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Heart, LogOut, Shield } from "lucide-react";
+import { ConfirmModal } from "../components/ConfirmModal";
 import '../css/Perfil.css';
 
 export const Perfil = () => {
   const { user, logout, isAdmin } = useAuth();
   const { count } = useFavoritos();
   const navigate = useNavigate();
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
+  const handleLogout = () => {
+    setLogoutModalOpen(true);
+  };
 
-  const handleLogout = async () => {
-    const confirm = window.confirm("Deseja realmente sair da conta?");
-    if (confirm) {
-      await logout();
-      navigate("/");
-    }
+  const confirmLogout = async () => {
+    setLogoutModalOpen(false);
+    await logout();
+    navigate("/");
   };
 
   // --- ESTADO NÃO LOGADO (Redesign) ---
@@ -28,7 +32,7 @@ export const Perfil = () => {
              <User size={40} />
           </div>
           <h2>Acesso Restrito</h2>
-          <p style={{color: 'var(--secondary)', marginTop: '0.5rem'}}>
+          <p className="perfil-subtitle">
             Para acessar seu perfil e ver os imóveis favoritos, você precisa entrar na sua conta.
           </p>
           <button className="btn-primary-lg" onClick={() => navigate("/login")}>
@@ -41,106 +45,118 @@ export const Perfil = () => {
 
   // --- ESTADO LOGADO (Redesign) ---
   return (
-    <div className="perfil-page">
-      
-      {/* 1. BANNER SUPERIOR */}
-      <div className="perfil-header-bg"></div>
+    <>
+      <div className="perfil-page">
 
-      <div className="perfil-container">
-        <div className="perfil-card">
-          
-          {/* 2. CABEÇALHO DO PERFIL (Avatar + Nome) */}
-          <div className="perfil-top-section">
-            <div className="perfil-avatar-wrapper">
-              {user.photoURL ? (
-                <img 
-                  src={user.photoURL} 
-                  alt="Foto de perfil" 
-                  className="perfil-avatar-img"
-                />
-              ) : (
-                <div className="perfil-avatar-placeholder">
-                  <User size={64} />
+        {/* 1. BANNER SUPERIOR */}
+        <div className="perfil-header-bg"></div>
+
+        <div className="perfil-container">
+          <div className="perfil-card">
+
+            {/* 2. CABEÇALHO DO PERFIL (Avatar + Nome) */}
+            <div className="perfil-top-section">
+              <div className="perfil-avatar-wrapper">
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="Foto de perfil"
+                    className="perfil-avatar-img"
+                  />
+                ) : (
+                  <div className="perfil-avatar-placeholder">
+                    <User size={64} />
+                  </div>
+                )}
+              </div>
+
+              <h1 className="perfil-name">
+                {user.displayName || (user.email ? user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1) : "Usuário")}
+              </h1>
+
+              <div className="perfil-email">
+                <Mail size={16} />
+                <span>{user.email}</span>
+              </div>
+
+              {isAdmin && (
+                <div className="perfil-badge-admin">
+                  <Shield size={14} fill="currentColor" /> Administrador
                 </div>
               )}
             </div>
 
-            <h1 className="perfil-name">
-              {user.displayName || (user.email ? user.email.split('@')[0].charAt(0).toUpperCase() + user.email.split('@')[0].slice(1) : "Usuário")}
-            </h1>
-            
-            <div className="perfil-email">
-              <Mail size={16} />
-              <span>{user.email}</span>
-            </div>
+            {/* 3. CONTEÚDO / AÇÕES */}
+            <div className="perfil-content">
+              <h3 className="perfil-section-title">
+                Minhas Atividades
+              </h3>
 
-            {isAdmin && (
-              <div className="perfil-badge-admin">
-                <Shield size={14} fill="currentColor" /> Administrador
-              </div>
-            )}
-          </div>
+              <div className="perfil-grid">
 
-          {/* 3. CONTEÚDO / AÇÕES */}
-          <div className="perfil-content">
-            <h3 className="perfil-section-title">
-              Minhas Atividades
-            </h3>
-
-            <div className="perfil-grid">
-              
-              {/* Card Favoritos */}
-              <div 
-                onClick={() => navigate("/favoritos")}
-                className="perfil-action-card"
-              >
-                <div className="perfil-action-icon icon-fav">
-                  <Heart fill={count > 0 ? "#ef4444" : "none"} size={24} />
-                </div>
-                <div className="perfil-action-info">
-                  <h3>Imóveis Favoritos</h3>
-                  <p>
-                    {count} {count === 1 ? "imóvel salvo" : "imóveis salvos"}
-                  </p>
-                </div>
-              </div>
-
-               {/* Card Admin (Visível Apenas para Admin) */}
-              {isAdmin && (
-                <div 
-                  onClick={() => navigate("/admin")}
+                {/* Card Favoritos */}
+                <div
+                  onClick={() => navigate("/favoritos")}
                   className="perfil-action-card"
-                  style={{ borderColor: 'var(--accent-color)' }}
                 >
-                  <div className="perfil-action-icon icon-settings" style={{ backgroundColor: '#fefbed', color: 'var(--accent-color)' }}>
-                    <Shield size={24} />
+                  <div className="perfil-action-icon icon-fav">
+                    <Heart fill={count > 0 ? "#ef4444" : "none"} size={24} />
                   </div>
                   <div className="perfil-action-info">
-                    <h3 style={{ color: 'var(--accent-color)' }}>Painel Admin</h3>
+                    <h3>Imóveis Favoritos</h3>
                     <p>
-                      Gerenciar imóveis e terrenos do site
+                      {count} {count === 1 ? "imóvel salvo" : "imóveis salvos"}
                     </p>
                   </div>
                 </div>
-              )}
+
+                {/* Card Admin (Visível Apenas para Admin) */}
+                {isAdmin && (
+                  <div
+                    onClick={() => navigate("/admin")}
+                    className="perfil-action-card perfil-action-card--admin"
+                  >
+                    <div className="perfil-action-icon icon-settings icon-settings--admin">
+                      <Shield size={24} />
+                    </div>
+                    <div className="perfil-action-info">
+                      <h3 className="perfil-action-title--admin">Painel Admin</h3>
+                      <p>
+                        Gerenciar imóveis e terrenos do site
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+              </div>
+
+              <div className="perfil-divider"></div>
+
+              {/* BOTÃO SAIR */}
+              <div className="btn-logout-container">
+                <button
+                  onClick={handleLogout}
+                  className="btn-logout"
+                >
+                  <LogOut size={20} /> Sair da Conta
+                </button>
+              </div>
 
             </div>
-
-             <div style={{borderTop: '1px solid #f1f5f9', margin: '1rem 0'}}></div>
-
-            {/* BOTÃO SAIR */}
-            <div className="btn-logout-container">
-              <button 
-                onClick={handleLogout}
-                className="btn-logout"
-              >
-                <LogOut size={20} /> Sair da Conta
-              </button>
-            </div>
-
           </div>
         </div>
       </div>
-    </div>
+
+      <ConfirmModal
+        isOpen={logoutModalOpen}
+        title="Sair da conta?"
+        message="Tem certeza que deseja sair? Você precisará fazer login novamente."
+        confirmLabel="Sim, sair"
+        cancelLabel="Cancelar"
+        variant="warning"
+        onConfirm={confirmLogout}
+        onCancel={() => setLogoutModalOpen(false)}
+      />
+    </>
   );
 };

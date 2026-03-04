@@ -77,6 +77,22 @@ export const FavoritosProvider = ({ children }: { children: ReactNode }) => {
     return todosImoveis.filter(imovel => favoritosIds.includes(imovel.id));
   }, [todosImoveis, favoritosIds]);
 
+  // Limpa IDs órfãos (imóveis que foram deletados do Firestore)
+  useEffect(() => {
+    if (favoritosIds.length === 0 || todosImoveis.length === 0) return;
+    const idsExistentes = new Set(todosImoveis.map(i => i.id));
+    const idsValidos = favoritosIds.filter(id => idsExistentes.has(id));
+    if (idsValidos.length === favoritosIds.length) return; // nada a limpar
+
+    setFavoritosIds(idsValidos);
+    if (user) {
+      const userRef = doc(db, "users", user.uid);
+      setDoc(userRef, { favoritosIds: idsValidos }, { merge: true }).catch(console.error);
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(idsValidos));
+    }
+  }, [todosImoveis, favoritosIds, user]);
+
   // Função para Favoritar/Desfavoritar (agora só gerencia IDs)
   const toggleFavorito = async (id: string) => {
     const jaExiste = favoritosIds.includes(id);
@@ -105,7 +121,7 @@ export const FavoritosProvider = ({ children }: { children: ReactNode }) => {
   const isFavorito = (id: string) => favoritosIds.includes(id);
 
   return (
-    <FavoritosContext.Provider value={{ favoritos, favoritosIds, toggleFavorito, isFavorito, count: favoritosIds.length }}>
+    <FavoritosContext.Provider value={{ favoritos, favoritosIds, toggleFavorito, isFavorito, count: favoritos.length }}>
       {children}
     </FavoritosContext.Provider>
   );

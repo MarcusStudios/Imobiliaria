@@ -15,6 +15,7 @@ service cloud.firestore {
                     && request.resource.data.visualizacoes == resource.data.get('visualizacoes', 0) + 1;
 
       // Admin pode fazer qualquer escrita (create, update, delete)
+      // UID: UG2t4JLe6WgzQShgaBP83EfXgfy1 (atualizar em SETUP.md e storage.rules se mudar)
       allow write: if request.auth != null && request.auth.uid == "UG2t4JLe6WgzQShgaBP83EfXgfy1";
     }
 

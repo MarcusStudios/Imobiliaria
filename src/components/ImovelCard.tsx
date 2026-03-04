@@ -54,6 +54,7 @@ export const ImovelCard = ({ imovel }: ImovelCardProps) => {
           alt={imovel.titulo}
           className="card-img"
           loading="lazy"
+          onError={(e) => { (e.target as HTMLImageElement).src = '/sem-foto.png'; }}
         />
 
         <span className="badge-type">

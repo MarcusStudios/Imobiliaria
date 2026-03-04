@@ -2,10 +2,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { ImovelCard } from "../components/ImovelCard";
+import { ImovelCardSkeleton } from "../components/Skeleton";
 import { FilterBar } from "../components/FilterBar";
 import { useSEO } from "../hooks/useSEO";
 import { useImoveis } from "../hooks/useImoveis";
 import "../css/Home.css";
+import "../css/Skeleton.css";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -143,41 +145,44 @@ export const Home = () => {
       </div>
 
       <div className="container">
-        {loading ? (
-          <p className="loading-state">Carregando imóveis...</p>
-        ) : (
-          <>
-            <div className="grid imoveis-grid">
-              {listaFinal.length > 0 ? (
-                listaFinal.map((imovel) => (
-                  <ImovelCard key={imovel.id} imovel={imovel} />
-                ))
-              ) : (
-                <div className="empty-state">
-                  <span className="empty-icon">🔍</span>
-                  <h3 className="empty-title">Nenhum imóvel encontrado</h3>
-                  <p className="empty-desc">
-                    Tente ajustar seus filtros ou remover algumas restrições.
-                  </p>
-                  <button onClick={handleClearFilters} className="btn-clear">
-                    Limpar Filtros
-                  </button>
-                </div>
-              )}
+        <div
+          className="grid imoveis-grid"
+          aria-live="polite"
+          aria-label="Lista de imóveis"
+        >
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <ImovelCardSkeleton key={i} />
+            ))
+          ) : listaFinal.length > 0 ? (
+            listaFinal.map((imovel) => (
+              <ImovelCard key={imovel.id} imovel={imovel} />
+            ))
+          ) : (
+            <div className="empty-state">
+              <span className="empty-icon">🔍</span>
+              <h3 className="empty-title">Nenhum imóvel encontrado</h3>
+              <p className="empty-desc">
+                Tente ajustar seus filtros ou remover algumas restrições.
+              </p>
+              <button onClick={handleClearFilters} className="btn-clear">
+                Limpar Filtros
+              </button>
             </div>
+          )}
+        </div>
 
-            {/* Botão Carregar Mais */}
-            {hasMore && (
-              <div className="load-more-container">
-                <button
-                  className="btn-load-more"
-                  onClick={() => setVisibleCount(prev => prev + ITEMS_PER_PAGE)}
-                >
-                  Carregar Mais Imóveis ({listaOrdenada.length - visibleCount} restantes)
-                </button>
-              </div>
-            )}
-          </>
+        {/* Botão Carregar Mais */}
+        {!loading && hasMore && (
+          <div className="load-more-container">
+            <button
+              className="btn-load-more"
+              onClick={() => setVisibleCount(prev => prev + ITEMS_PER_PAGE)}
+              aria-label={`Carregar mais imóveis. ${listaOrdenada.length - visibleCount} restantes`}
+            >
+              Carregar Mais Imóveis ({listaOrdenada.length - visibleCount} restantes)
+            </button>
+          </div>
         )}
       </div>
     </div>

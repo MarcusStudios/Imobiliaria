@@ -306,3 +306,35 @@
     font-size: 1.5rem;
   }
 }
+
+/* Divider entre seções */
+.perfil-divider {
+  border-top: 1px solid #f1f5f9;
+  margin: 1rem 0;
+}
+
+/* Subtitle no estado de acesso restrito */
+.perfil-subtitle {
+  color: var(--secondary);
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Variante Admin do card */
+.perfil-action-card--admin {
+  border-color: var(--accent-color, #ca8a04);
+}
+
+.perfil-action-card--admin:hover {
+  border-color: var(--accent-color, #ca8a04);
+}
+
+.icon-settings--admin {
+  background: #fefbed;
+  color: var(--accent-color, #ca8a04);
+}
+
+.perfil-action-title--admin {
+  color: var(--accent-color, #ca8a04) !important;
+}
