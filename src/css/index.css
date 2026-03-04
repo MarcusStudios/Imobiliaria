@@ -1,28 +1,35 @@
 /* =========================================
-   src/index.css - BORDAS FORTES E INPUTS DESTACADOS
+   src/index.css - Variáveis, Reset, Base e Utilitários
+   =========================================
+   NOTA: Estilos de componentes (header, cards, hero, etc.)
+   ficam em App.css. Este arquivo cuida apenas de:
+   - Variáveis CSS (design tokens)
+   - Reset global
+   - Estilos base do body
+   - Utilitários globais (sr-only, acessibilidade)
+   - WhatsApp float (componente global)
+   - Animações globais
    ========================================= */
 
 :root {
   --primary: #2563eb;       /* Azul Royal */
   --primary-dark: #1e40af;  /* Azul Escuro */
   --secondary: #475569;     /* Cinza Escuro */
-  
+
   --bg-page: #f1f5f9;       /* Fundo Cinza Gelo */
   --bg-card: #ffffff;       /* Branco */
-  
+
   --text-main: #0f172a;     /* Preto Azulado */
-  
+
   /* BORDAS DOS INPUTS */
   --input-border: #cbd5e1;  /* Cinza Sólido (Borda Padrão) */
   --input-focus: #2563eb;   /* Azul (Borda Focada) */
   --border-light: #e2e8f0;  /* Borda leve clara */
-  
+
   --radius: 12px;
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
-
-
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -39,82 +46,11 @@
   border-width: 0;
 }
 
-
 body {
-background-color: #f4f8f5; /* quase branco, levíssimo esverdeado */  color: var(--text-main);
+  background-color: #f4f8f5;
+  color: var(--text-main);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-}
-
-.container {
-  max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;
-}
-
-/* --- HEADER --- */
-.header {
-  position: sticky; top: 0; z-index: 1000;
-  background: var(--bg-card); /* Mudança para ficar igual ao card (branco ou escuro) e não vermelho */
-  border-bottom: 4px solid var(--input-border); 
-  padding: 0.8rem 0;
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: saturate(187%) blur(20px);
-}
-.header-content { display: flex; align-items: center; justify-content: space-between; }
-.logo {
-  font-size: 1.5rem; font-weight: 800; color: var(--text-main);
-  text-decoration: none; display: flex; align-items: center; gap: 8px;
-}
-.logo svg { color: var(--primary); }
-nav { display: flex; gap: 0.5rem; }
-.nav-link {
-  text-decoration: none; color: var(--secondary);
-  font-weight: 600; font-size: 0.95rem; padding: 0.6rem 1rem;
-  border-radius: 8px; transition: all 0.2s;
-  border: 2px solid transparent; /* Reserva espaço */
-  display: flex; align-items: center; gap: 6px;
-}
-.nav-link:hover {
-  color: var(--primary); background: #eff6ff;
-  border-color: #bfdbfe; /* Borda azul no menu */
-}
-.fav-count {
-  background: #ef4444; color: white; font-size: 0.75rem;
-  min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
-  border-radius: 10px; font-weight: 700;
-}
-
-/* --- HERO --- */
-.hero {
-  background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)),
-              url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80');
-  background-size: cover;
-  background-position: center;
-  color: #f8fafc;
-  padding: 6rem 0;
-  text-align: center;
-  margin-bottom: 3rem; /* Espaço adicionado abaixo do hero para afastar os cards */
-}
-.hero-content { margin-top: -2rem; }
-.hero-content h1 { font-size: 2.8rem; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-
-/* --- INPUTS DESTACADOS (AQUI ESTÁ A MUDANÇA) --- */
-.input-control {
-  width: 100%; padding: 0.75rem 1rem;
-  
-  /* MUDANÇA: Borda de 2px sólida */
-  border: 2px solid var(--input-border); 
-  
-  border-radius: 8px; font-size: 1rem; color: var(--text-main);
-  background-color: var(--bg-card); /* Ajustado para acompanhar o card */
-  transition: all 0.2s; height: 48px;
-  font-weight: 500; /* Texto um pouco mais grosso para ler melhor */
-}
-
-/* Quando clica no input */
-.input-control:focus {
-  outline: none;
-  border-color: var(--input-focus); /* Fica azul forte */
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); /* Anel externo azul */
 }
 
 /* ===================================================
@@ -131,230 +67,11 @@ select:focus-visible,
   border-radius: 4px;
 }
 
-
-label.label {
-  display: block; font-size: 0.85rem; font-weight: 700;
-  color: var(--secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;
-}
-
-/* --- PAINEL ADMIN --- */
-form section {
-  background-color: var(--bg-card);
-  border: 2px solid var(--border-light); /* Borda grossa nas seções */
-  padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;
-}
-form section h3 {
-  color: var(--primary-dark) !important; font-size: 1.1rem;
-  margin-bottom: 1.2rem !important;
-  border-bottom: 2px dashed #cbd5e1 !important;
-  padding-bottom: 0.5rem;
-}
-
-/* --- HOME: SEARCH CARD --- */
-.search-card {
-  background: var(--bg-card); padding: 2rem;
-  border-radius: var(--radius); box-shadow: var(--shadow-lg);
-  margin-bottom: 3rem; position: relative; z-index: 10;
-  border: 2px solid var(--border-light); /* Borda em volta da busca */
-  border-top: 5px solid var(--primary); /* Topo bem grosso */
-}
-.search-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1.5rem; align-items: end; }
-
-/* --- GRID & CARDS --- */
-.imoveis-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-  gap: 2rem; padding-bottom: 4rem;
-  padding: 1rem;
-}
-
-.card {
-  background: var(--bg-card); border-radius: var(--radius);
-  border: 1px solid var(--input-border); /* Borda do card */
-  box-shadow: var(--shadow-sm);
-  display: flex; flex-direction: column; overflow: hidden;
-  transition: all 0.3s ease; position: relative;
-}
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--primary); /* Borda azul no hover */
-  border-width: 2px; /* Mantém fina para elegância */
-  
-}
-
-.card-img-wrapper { height: 450px; position: relative; background: var(--bg-page); border-bottom: 1px solid var(--input-border); }
-.card-img { width: 100%; height: 100%; object-fit: cover; }
-.card-img:hover {
-  border-width: 2px;
-}
-
-
-
-.badge-type {
-  position: absolute; top: 12px; left: 12px;
-  background: rgba(15, 23, 42, 0.95); color: white;
-  padding: 6px 12px; border-radius: 6px;
-  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-  border: 1px solid rgba(255,255,255,0.3);
-  
-}
-
-.btn-fav {
-  position: absolute; top: 12px; right: 12px;
-  background: var(--bg-card); border: 2px solid var(--border-light); /* Borda grossa no botão fav */
-  width: 40px; height: 40px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  color: var(--secondary); transition: all 0.2s;
-}
-.btn-fav:hover { transform: scale(1.1); color: #ef4444; border-color: #fca5a5; }
-.btn-fav.active { color: #ef4444; border-color: #fca5a5; background: #fef2f2; }
-
-.card-body { padding: 1.5rem; display: flex; flex-direction: column; flex: 1; }
-.card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.4; color: var(--text-main); }
-.card-price { font-weight: 700; font-size: 1.5rem; color: var(--primary); margin-bottom: 1rem; }
-
-/* Setas de navegação do carrossel */
-.card-arrow-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  color: #fff;
-  transition: all 0.2s ease;
-}
-.card-arrow-btn:hover { background: rgba(0, 0, 0, 0.55); }
-.card-arrow-btn--left  { left: 8px; }
-.card-arrow-btn--right { right: 8px; }
-
-/* Badge destaque */
-.card-badge-destaque {
-  position: absolute;
-  top: 44px;
-  left: 12px;
-  background: linear-gradient(135deg, #f59e0b, #ea580c);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  z-index: 15;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  border: 1px solid rgba(255,255,255,0.3);
-}
-
-/* Preço */
-.card-price-block {
-  min-height: 3.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-}
-.card-price-row { font-size: 0.9rem; color: var(--text-main); }
-.card-price-value { font-weight: 700; color: var(--primary); }
-.card-price-value--green { color: #16a34a; }
-.card-price-single { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
-
-/* Endereço */
-.address { font-size: 0.9rem; color: #64748b; margin-bottom: 10px; margin-top: 5px; display: flex; align-items: center; gap: 4px; }
-.address-icon { display: inline; flex-shrink: 0; }
-
-/* Badge categoria terreno */
-.card-badge-categoria {
-  margin-left: auto;
-  font-size: 0.75rem;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #f8fafc;
-}
-
-.features-row {
-  display: flex; gap: 1.2rem; margin-bottom: 1.5rem;
-  color: var(--secondary); font-size: 0.9rem;
-  border-top: 2px solid var(--bg-page); padding-top: 1rem;
-}
-.feat { display: flex; align-items: center; gap: 6px; font-weight: 500; }
-
-.btn-details {
-  margin-top: auto; display: block; text-align: center;
-  background: var(--primary); color: white;
-  padding: 0.9rem; border-radius: 8px; text-decoration: none;
-  font-weight: 700; cursor: pointer; width: 100%; border: none;
-  transition: background 0.2s;
-}
-.btn-details:hover { background: var(--primary); }
-
-/* --- LOGIN --- */
-.auth-container { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
-.auth-card {
-  background: var(--bg-card); padding: 3rem; border-radius: var(--radius);
-  box-shadow: var(--shadow-lg); width: 100%; max-width: 450px; text-align: center;
-  border: 2px solid var(--border-light);
-  border-top: 5px solid var(--primary);
-}
-
-/* --- RESPONSIVIDADE --- */
-@media (max-width: 768px) {
-  
-  /* 1. Evita zoom automático no iPhone ao clicar no input */
-  input, select, textarea {
-    font-size: 16px !important; 
-  }
-
-  /* 2. Botões maiores para facilitar o toque (Área de toque mínima de 44px) */
-  button, .btn-details, .nav-link {
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* 3. Ajuste do Grid para telas pequenas (já tínhamos feito, mas reforçando) */
-  .imoveis-grid {
-    grid-template-columns: 1fr; /* Uma coluna só */
-    gap: 1.5rem;
-    
-  }
-
-  /* 4. Menu de Navegação Horizontal no Celular (Estilo App) */
-  /* Isso deixa o menu mais fácil de usar com uma mão */
-  nav {
-    flex-wrap: nowrap; /* Não quebra linha */
-    overflow-x: auto;  /* Permite rolar para o lado se tiver muitos itens */
-    padding-bottom: 5px;
-    justify-content: flex-start; /* Começa da esquerda */
-    -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
-  }
-  
-  .nav-link {
-    flex-shrink: 0; /* Não esmaga os botões */
-    white-space: nowrap;
-  }
-}
-/* --- Botão Flutuante do WhatsApp (LADO ESQUERDO) --- */
+/* --- Botão Flutuante do WhatsApp --- */
 .whatsapp-float {
   position: fixed;
   bottom: 20px;
-  
-  /* MUDANÇA AQUI: */
-  left: 20px;  /* Antes era 'right: 20px' */
-  
+  left: 20px;
   background-color: #25D366;
   color: white;
   padding: 12px 20px;
@@ -376,7 +93,6 @@ form section h3 {
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
 }
 
-/* Ajuste para celular */
 @media (max-width: 480px) {
   .whatsapp-float {
     padding: 12px;
@@ -388,14 +104,14 @@ form section h3 {
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+  70%  { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
   100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
 }
 
-/* Adicione isso no seu CSS */
+/* Animação arco-íris (usada no texto decorativo) */
 @keyframes rainbow-move {
-  0% { background-position: 0% 50%; }
+  0%   { background-position: 0% 50%; }
   100% { background-position: 100% 50%; }
 }
 
@@ -408,26 +124,11 @@ form section h3 {
   animation: rainbow-move 5s ease infinite;
   font-weight: bold;
   font-size: 24px;
-  
 }
 
-/* Adicione no seu CSS global */
-.details-content {
-  display: flex;
-  gap: 2rem;
-  margin-top: 2rem;
-  align-items: flex-start; /* Importante para o sticky funcionar */
-}
-
-/* Responsividade para celular */
+/* Mobile: evita zoom automático ao clicar no input (iOS) */
 @media (max-width: 768px) {
-  .details-content {
-    flex-direction: column;
-  }
-  
-  /* No celular, a sidebar não deve ser sticky para não atrapalhar */
-  aside {
-    position: static !important;
-    width: 100%;
+  input, select, textarea {
+    font-size: 16px !important;
   }
 }

@@ -15,7 +15,7 @@ export const Footer = () => {
             Açailândia e Região.
           </p>
           <p className="footer-version">
-            Seu parceiro confiável no mercado imobiliário. V2.2
+            Seu parceiro confiável no mercado imobiliário.
           </p>
         </div>
 

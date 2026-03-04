@@ -52,12 +52,8 @@ export const uploadMultipleImages = async (files: File[]): Promise<string[]> => 
   }
 };
 
-// Função para deletar imagem (opcional, requer configuração de API key)
-export const deleteImageFromCloudinary = async (publicId: string): Promise<void> => {
-  // Isso requer um backend para manter sua API key segura
-  // Por enquanto, você pode deixar as imagens no Cloudinary
-  console.log('Deletar imagem:', publicId);
-};
+// NOTA: Deletar imagens do Cloudinary requer um backend seguro
+// para manter a API Secret protegida. Funcionalidade não implementada.
 
 // Função helper para otimizar URLs do Cloudinary
 export const optimizeCloudinaryUrl = (url: string, width = 800): string => {
